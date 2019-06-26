@@ -3,7 +3,7 @@ Description=Changes background
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash $HOME/.local/share/systemd/user/background.sh
+ExecStart=/bin/bash HOME/.local/share/systemd/user/background.sh
 
 [Install]
 WantedBy=default.target
