@@ -55,11 +55,13 @@ for pkg in ${pkgs[@]}; do
 done
 
 # Start and enable any necessary services
-systemctl start system76.service
-systemctl start system76-firmware-daemon.service
-systemctl start system76-power.service
+sudo systemctl start system76.service
+sudo systemctl start system76-firmware-daemon.service
+sudo systemctl start system76-power.service
 
-systemctl enable system76.service
-systemctl enable system76-firmware-daemon.service
-systemctl enable system76-power.service
+sudo systemctl enable system76.service
+sudo systemctl enable system76-firmware-daemon.service
+sudo systemctl enable system76-power.service
 
+# Load the system76 module as well
+sudo modprobe system76
