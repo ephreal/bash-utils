@@ -1,0 +1,14 @@
+"*":
+  core:
+    telemetryConsent: "no"
+  editor:
+    fontSize: 18
+    tabLength: 4
+    tabType: "soft"
+  "exception-reporting":
+    userId: "d818ab8a-1da9-470a-9a24-78aa3a3fc9ed"
+  "linter-ui-default":
+    panelHeight: 251
+    showPanel: true
+  welcome:
+    showOnStartup: false
