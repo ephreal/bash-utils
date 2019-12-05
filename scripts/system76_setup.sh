@@ -53,3 +53,13 @@ function download_and_install() {
 for pkg in ${pkgs[@]}; do
     download_and_install $pkg
 done
+
+# Start and enable any necessary services
+systemctl start system76.service
+systemctl start system76-firmware-daemon.service
+systemctl start system76-power.service
+
+systemctl enable system76.service
+systemctl enable system76-firmware-daemon.service
+systemctl enable system76-power.service
+
