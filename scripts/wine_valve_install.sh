@@ -4,6 +4,9 @@
 # have had some issues with installation, this is installing additional
 # packages as well. This also brings installs proton as it's commonly
 # used with win-valve-git
+#
+# This also installs libraries needed to have steam work properly with
+# proton.
 
 # A list of what packages are needed in order to install wine-valve-git
 pkgs=(
@@ -13,11 +16,12 @@ pkgs=(
        "lib32-vkd3d-valve-git"
        "wine-valve-git"
        "proton"
+       "python-vdf"
+       "protontricks"
      )
 
-
-# Install a useful package for system76-driver before continuing
-pacman -S xorg-xbacklight
+# Libraries needed to make steam work with proton
+LIBS="lib32-libnm-glib lib32-libvdpau lib32-libudev0-shim libudev0-shim"
 
 function download_and_install() {
     # I'd like to give the parameter a decent name....
@@ -47,14 +51,4 @@ for pkg in ${pkgs[@]}; do
     download_and_install $pkg
 done
 
-# Start and enable any necessary services
-sudo systemctl start system76.service
-sudo systemctl start system76-firmware-daemon.service
-sudo systemctl start system76-power.service
-
-sudo systemctl enable system76.service
-sudo systemctl enable system76-firmware-daemon.service
-sudo systemctl enable system76-power.service
-
-# Load the system76 module as well
-sudo modprobe system76
+sudo pacman -Sy $LIBS --noconfirm
