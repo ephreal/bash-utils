@@ -15,8 +15,7 @@ wget https://aur.archlinux.org/cgit/aur.git/snapshot/discord-canary.tar.gz
 tar -xvf discord-canary.tar.gz
 mv discord-canary.tar.gz discord-canary
 cd discord-canary
-makepkg -s
-sudo pacman -U discord-canary-*.pkg.tar.xz --noconfirm
+makepkg -s --noconfirm -i
 
 # Cleanup
 cd ..

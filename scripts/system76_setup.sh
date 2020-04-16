@@ -42,9 +42,7 @@ function download_and_install() {
 
     cd $package
     
-    makepkg -s
-
-    sudo pacman -U $package*.pkg.tar.xz --noconfirm
+    makepkg -s -i --noconfirm
 
     cd ..
     rm -r $package
