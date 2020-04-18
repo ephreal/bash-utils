@@ -21,7 +21,7 @@ pkgs=(
      )
 
 # Libraries needed to make steam work with proton
-LIBS="lib32-libnm-glib lib32-libvdpau lib32-libudev0-shim libudev0-shim"
+LIBS="lib32-libnm-glib lib32-libvdpau lib32-libudev0-shim libudev0-shim lib32-libva"
 
 function download_and_install() {
     # I'd like to give the parameter a decent name....
