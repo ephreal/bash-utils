@@ -12,9 +12,9 @@
 pkgs=(
       "spirv-headers-git"
       "lib32-spirv-tools"
-       "vkd3d-valve-git"
-       "lib32-vkd3d-valve-git"
-       "wine-valve-git"
+       "vkd3d-valve"
+#       "lib32-vkd3d-valve"
+       "wine-valve"
        "proton"
        "python-vdf"
        "protontricks"
