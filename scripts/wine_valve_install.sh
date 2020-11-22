@@ -21,7 +21,9 @@ pkgs=(
      )
 
 # Libraries needed to make steam work with proton
-LIBS="lib32-libnm-glib lib32-libvdpau lib32-libudev0-shim libudev0-shim lib32-libva"
+LIBS="lib32-libnm-glib lib32-libvdpau lib32-libudev0-shim libudev0-shim lib32-libva lib32-vkd3d-valve"
+
+sudo pacman -Sy $LIBS --noconfirm
 
 function download_and_install() {
     # I'd like to give the parameter a decent name....
@@ -49,4 +51,3 @@ for pkg in ${pkgs[@]}; do
     download_and_install $pkg
 done
 
-sudo pacman -Sy $LIBS --noconfirm
