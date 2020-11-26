@@ -10,7 +10,7 @@ versions=(
     "5.21-GE-1" # Warframe
     "5.6-GE-2" # Assassin's Creed (all of them)
     "5.4-GE-3" # Deep Rock Galactic
-    "5.2-GE-2"
+    "5.2-GE-2" # Dishonored, Dishonored 2
 )
 
 # Warframe
