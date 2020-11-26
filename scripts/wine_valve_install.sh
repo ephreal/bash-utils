@@ -21,7 +21,7 @@ pkgs=(
      )
 
 # Libraries needed to make steam work with proton
-LIBS="lib32-libnm-glib lib32-libvdpau lib32-libudev0-shim libudev0-shim lib32-libva lib32-vkd3d"
+LIBS="lib32-faudio lib32-libnm-glib lib32-libvdpau lib32-libudev0-shim libudev0-shim lib32-libva lib32-vkd3d"
 
 sudo pacman -Sy $LIBS --noconfirm
 
