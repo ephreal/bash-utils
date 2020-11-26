@@ -13,30 +13,17 @@ versions=(
     "5.2-GE-2" # Dishonored, Dishonored 2
 )
 
-# Warframe
-if [ ! -d Proton-5.21-GE-1 ]; then
-    wget https://github.com/GloriousEggroll/proton-ge-custom/releases/download/5.21-GE-1/Proton-5.21-GE-1.tar.gz
-    tar -xvf Proton-5.21-GE-1.tar.gz
-    rm Proton-5.21-GE-1.tar.gz
-fi
 
-# Assassin's creed (all of them currently)
-if [ ! -d Proton-5.6-GE-2 ]; then
-    wget https://github.com/GloriousEggroll/proton-ge-custom/releases/download/5.6-GE-2/Proton-5.6-GE-2.tar.gz
-    tar -xvf Proton-5.6-GE-2.tar.gz
-    rm Proton-5.6-GE-2.tar.gz
-fi
+# This is how I would prefer to have these run... that way all I need to do is
+# add a particular GE version up top if I ever need them.
 
-# Deep rock galactic
-if [ ! -d Proton-5.4-GE-3 ]; then
-    wget https://github.com/GloriousEggroll/proton-ge-custom/releases/download/5.4-GE-3/Proton-5.4-GE-3.tar.gz
-    tar -xvf Proton-5.4-GE-3.tar.gz
-    rm Proton-5.4-GE-3.tar.gz
-fi
+for ge_version in ${versions[@]}; do
 
-# Dishonored, Dishonored 2
-if [ ! -d Proton-5.2-GE-2 ]; then
-    wget https://github.com/GloriousEggroll/proton-ge-custom/releases/download/5.2-GE-2/Proton-5.2-GE-2.tar.gz
-    tar -xvf Proton-5.2-GE-2.tar.gz
-    rm Proton-5.2-GE-2.tar.gz
-fi
+    if [ ! -d Proton-$ge_version ]; then
+        echo "\n\nInstalling Proton-$ge_version\n\n"
+        wget https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$ge_version/Proton-$ge_version.tar.gz
+        tar -xvf Proton-$ge_version.tar.gz
+        rm Proton-$ge_version.tar.gz
+    fi
+
+done
