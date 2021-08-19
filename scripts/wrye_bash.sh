@@ -1,0 +1,1 @@
+STEAM_COMPAT_DATA_PATH=~/.local/share/Steam/steamapps/compatdata/22330/ ~/.local/share/Steam/compatibilitytools.d/Proton-5.6-GE-2/proton run ~/.steam/steam/steamapps/common/Oblivion/Mopy/Wrye\ Bash.exe

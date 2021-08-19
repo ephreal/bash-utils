@@ -20,6 +20,8 @@ pkgs=(
         "system76-oled"
         "system76-power"
         "system76-wallpapers"
+# I might try using this some time....
+#        "gnome-control-center-system76"
      )
 
 
