@@ -15,19 +15,19 @@
 # would still be good to install as it allows wine to function well
 # with steam's proton
 pkgs=(
-      "spirv-headers-git"
-      "lib32-spirv-tools"
-       "vkd3d-valve"
+##      "spirv-headers-git"
+##      "lib32-spirv-tools"
+##       "vkd3d-valve"
 #       "wine-valve"
 #       "proton"
        "python-vdf"
-#       "protontricks"
+       "protontricks"
      )
 
 # Libraries needed to make steam work with proton
 LIBS="lib32-faudio lib32-libnm-glib lib32-libvdpau lib32-libudev0-shim libudev0-shim lib32-libva lib32-vkd3d"
 
-PKGS="wine-staging wine-mono wine_gecko"
+PKGS="wine-staging wine-mono wine-gecko"
 
 sudo pacman -Sy $LIBS --noconfirm
 

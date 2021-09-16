@@ -1,16 +1,12 @@
 #!/bin/bash
 
-# This downloads and installs all system76 packages from the archlinux AUR
-# that I'd like to have. This could easily be adapted to install any AUR
-# package provided the dependencies install without requiring an AUR package
-# as a dependency.
 
-# This is split into it's own separate file as not every device I have comes
-# from system76.
-
-# Package list of all system76 packages I'd like
+# Ordered list of packages that must be installed.
+# Linphone is last.
 pkgs=(
-        "firmware-manager-git"
+        "libdecaf"
+        "bctoolbox-git"
+        "liblinphone-git"
         "pm-utils"
         "system76-acpi-dkms"
         "system76-dkms"
@@ -25,8 +21,8 @@ pkgs=(
      )
 
 
-# Install a useful package for system76-driver before continuing
-pacman -S xorg-xbacklight
+# Install requirements that pacman can find first.
+pacman -Syu bzrtp cmake doxygen bcunit jsoncpp rhash ortp python-pystache qt5-tools xerces xsd
 
 function download_and_install() {
     # I'd like to give the parameter a decent name....
@@ -47,7 +43,7 @@ function download_and_install() {
     makepkg -s -i --noconfirm
 
     cd ..
-#    rm -r $package
+    rm -rf $package
 }
 
 for pkg in ${pkgs[@]}; do

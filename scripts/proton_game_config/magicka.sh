@@ -1,1 +1,1 @@
-protontricks 42910 dotnet35sp1 xna31
+protontricks 42910 d3dx9 dotnet35sp1 vcrun2008 xinput xna31
