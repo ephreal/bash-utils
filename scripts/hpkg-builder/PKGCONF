@@ -1,0 +1,4 @@
+git_repo_url="https://github.com/troydhanson/uthash"
+only_these_tags=false
+start_tag="v2.0.0"
+arch_list=("x86" "x86_64")
