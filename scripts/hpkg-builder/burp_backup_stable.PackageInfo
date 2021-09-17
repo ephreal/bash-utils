@@ -1,0 +1,25 @@
+name "burp_backup_stable"
+VERSION
+ARCHITECTURE
+
+summary "Provides uthash libraries"
+description "Uthash allows storing any C datastructure in a hash table"
+
+packager "Ephreal <contact@mylifeneeds.management>"
+vendor "Ephreal"
+
+copyrights {
+	"Copyright (c) 2005-2021, Troy D. Hanson http://troydhanson.github.io/uthash/"
+}
+
+licenses {
+	"BSD (2-clause)"
+}
+
+urls {
+	"https://github.com/troydhanson/uthash"
+}
+
+flags "system_package"
+
+PROVIDES
