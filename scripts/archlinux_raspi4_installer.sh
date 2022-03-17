@@ -18,6 +18,7 @@ then
     devs=($(ls /dev | grep ^sd[a-z]$))
 else
     echo "Invalid device option selected."
+    exit 0
 fi
 
 counter=1
