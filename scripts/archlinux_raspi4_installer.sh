@@ -2,9 +2,24 @@
 #arch_ver=ArchLinuxARM-rpi-aarch64-latest.tar.gz
 arch_ver=ArchLinuxARM-rpi-4-latest.tar.gz
 
+# Decides what block devices the script will search for as valid installabl
+# devices
+# Valid options:
+# sd-card
+# block
 
-devs=$(ls /dev | grep ^mmcblk[0-9]*$)
-#devs=($(ls /dev | grep ^sd[a-z]$))
+dev="sd-card"
+
+if [ $dev == "sd-card" ]
+then
+    devs=$(ls /dev | grep ^mmcblk[0-9]*$)
+elif [ $dev == "block" ]
+then
+    devs=($(ls /dev | grep ^sd[a-z]$))
+else
+    echo "Invalid device option selected."
+fi
+
 counter=1
 
 for dev in ${devs[@]}; do
@@ -45,8 +60,13 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | sudo fdisk /dev/$device
 EOF
 
 # Create boot partition
-boot="/dev/$(echo $device)p1"
-#boot="/dev/$(echo $device)1"
+if [ $dev == "sd-card" ]
+then
+    boot="/dev/$(echo $device)p1"
+else
+    boot="/dev/$(echo $device)1"
+fi
+
 # Ensure boot is unmounted. Some desktop environments automatically mount partitions
 umount $boot
 echo $boot
@@ -55,8 +75,13 @@ mkdir boot
 sudo mount $boot boot
 
 # Create root partition
-root="/dev/$(echo $device)p2" 
-#root="/dev/$(echo $device)2"
+if [ $dev == "sd-card" ]
+then
+    root="/dev/$(echo $device)p2" 
+else
+    root="/dev/$(echo $device)2"
+fi
+
 umount $root
 sudo mkfs.ext4 $root
 mkdir root
