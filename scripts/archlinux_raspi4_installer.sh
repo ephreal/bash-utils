@@ -1,6 +1,5 @@
 # Leave just ONE of these uncommented to choose your raspi archlinux version
-#arch_ver=ArchLinuxARM-rpi-aarch64-latest.tar.gz
-arch_ver=ArchLinuxARM-rpi-4-latest.tar.gz
+arch_ver=ArchLinuxARM-rpi-armv7-latest.tar.gz
 
 # Decides what block devices the script will search for as valid installabl
 # devices
@@ -8,7 +7,24 @@ arch_ver=ArchLinuxARM-rpi-4-latest.tar.gz
 # sd-card
 # block
 
-dev="sd-card"
+echo "Which type of device are you searching for?"
+echo "1) sd card"
+echo "2) block"
+read selection
+
+if [ $selection == "1" ]
+then
+    dev="sd-card"
+elif [ $selection == "2" ]
+then
+    dev="block"
+else
+    echo "Invalid selection"
+    exit 0
+fi
+
+echo "Searching for $dev devices..."
+echo ""
 
 if [ $dev == "sd-card" ]
 then
@@ -16,19 +32,17 @@ then
 elif [ $dev == "block" ]
 then
     devs=($(ls /dev | grep ^sd[a-z]$))
-else
-    echo "Invalid device option selected."
-    exit 0
 fi
 
 counter=1
+
+echo "Device found. Which device do you want to use?"
 
 for dev in ${devs[@]}; do
     echo "$counter) $dev"
     counter=$(($counter + 1))
 done
 
-echo "Which device do you want to use?"
 read dev
 device=$((dev - 1))
 echo "Using /dev/${devs[$device]}"
