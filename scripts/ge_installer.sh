@@ -10,6 +10,7 @@ cd $HOME/.steam/steam/compatibilitytools.d
 # future. For now, I just want to hack this together so it works.
 versions=(
 #    "6.5-GE-2" # Warframe
+    "7.2-GE-2" # Cyberpunk 2077
     "6.14-GE-2" # Warframe
     "5.6-GE-2" # Assassin's Creed (all of them), Satisfactory, Oblivion
     "5.4-GE-3" # Deep Rock Galactic
