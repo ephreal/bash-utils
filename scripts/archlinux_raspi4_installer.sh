@@ -1,6 +1,12 @@
 # Leave just ONE of these uncommented to choose your raspi archlinux version
 arch_ver=ArchLinuxARM-rpi-armv7-latest.tar.gz
 
+
+# Packages that I need installed after the base install completes
+# These are not installed automatically *yet*. They will be
+# eventually.
+required_packages="salt sudo vim wget"
+
 # Decides what block devices the script will search for as valid installabl
 # devices
 # Valid options:
@@ -56,6 +62,11 @@ fi
 device=${devs[$device]}
 sudo umount /dev/$device?*
 
+# Prompt for the hostname
+echo ""
+echo "Enter the hostname for this device: "
+read name
+
 # This part looks a little weird because fdisk accepts input directly from the stdin
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | sudo fdisk /dev/$device
     o # New Partition Table
@@ -101,6 +112,7 @@ umount $root
 sudo mkfs.ext4 $root
 mkdir root
 sudo mount $root root
+sudo echo $name > root/etc/hostname
 
 if [ ! -f $arch_ver ]; then
     wget http://os.archlinuxarm.org/os/$arch_ver
