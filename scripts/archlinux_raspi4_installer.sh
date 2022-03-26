@@ -20,22 +20,22 @@ read selection
 
 if [ $selection == "1" ]
 then
-    dev="sd-card"
+    dev_selection="sd-card"
 elif [ $selection == "2" ]
 then
-    dev="block"
+    dev_selection="block"
 else
     echo "Invalid selection"
     exit 0
 fi
 
-echo "Searching for $dev devices..."
+echo "Searching for $dev_selection devices..."
 echo ""
 
-if [ $dev == "sd-card" ]
+if [ $dev_selection == "sd-card" ]
 then
     devs=$(ls /dev | grep ^mmcblk[0-9]*$)
-elif [ $dev == "block" ]
+elif [ $dev_selection == "block" ]
 then
     devs=($(ls /dev | grep ^sd[a-z]$))
 fi
@@ -86,7 +86,7 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | sudo fdisk /dev/$device
 EOF
 
 # Create boot partition
-if [ $dev == "sd-card" ]
+if [ $dev_selection == "sd-card" ]
 then
     boot="/dev/$(echo $device)p1"
 else
@@ -101,7 +101,7 @@ mkdir boot
 sudo mount $boot boot
 
 # Create root partition
-if [ $dev == "sd-card" ]
+if [ $dev_selection == "sd-card" ]
 then
     root="/dev/$(echo $device)p2" 
 else
@@ -112,7 +112,6 @@ umount $root
 sudo mkfs.ext4 $root
 mkdir root
 sudo mount $root root
-sudo echo $name > root/etc/hostname
 
 if [ ! -f $arch_ver ]; then
     wget http://os.archlinuxarm.org/os/$arch_ver
@@ -121,12 +120,10 @@ fi
 sudo bsdtar -xpf $arch_ver -C root
 sudo sync
 
+sudo ls root
+sudo echo $name > root/etc/hostname
+
 sudo mv root/boot/* boot/
-
-if [ "$arch_ver" == "ArchLinuxARM-rpi-aarch64-latest.tar.gz" ]; then
-    sed -i 's/mmcblk0/mmcblk1/g' root/etc/fstab
-fi
-
 sudo umount boot root
 
 echo "The SD card should now be ready to use. Insert it into the raspberry pi and log in."
