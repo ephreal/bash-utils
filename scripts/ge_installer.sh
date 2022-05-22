@@ -11,12 +11,17 @@ cd $HOME/.steam/steam/compatibilitytools.d
 versions=(
 #    "6.5-GE-2" # Warframe
     "7.2-GE-2" # Cyberpunk 2077
-    "6.14-GE-2" # Warframe
     "5.6-GE-2" # Assassin's Creed (all of them), Satisfactory, Oblivion
     "5.4-GE-3" # Deep Rock Galactic
     "5.2-GE-2" # Dishonored, Dishonored 2
 )
 
+
+# Note: These new versions are versions that use the new naming scheme for proton
+
+newversions=(
+    "7-18"
+)
 
 # This is how I would prefer to have these run... that way all I need to do is
 # add a particular GE version up top if I ever need them.
@@ -30,4 +35,14 @@ for ge_version in ${versions[@]}; do
         rm Proton-$ge_version.tar.gz
     fi
 
+done
+
+
+for ge_version in ${newversions[@]}; do
+    if [ ! -d "GE-Proton$ge_version" ]; then
+        echo "\n\nInstalling GE-Proton$ge_version\n\n"
+        wget https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton$ge_version/GE-Proton$ge_version.tar.gz
+        tar -xvf GE-Proton$ge_version.tar.gz
+        rm GE-Proton$ge_version.tar.gz
+    fi
 done

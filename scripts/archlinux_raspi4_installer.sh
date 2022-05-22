@@ -94,7 +94,7 @@ else
 fi
 
 # Ensure boot is unmounted. Some desktop environments automatically mount partitions
-umount $boot
+sudo umount $boot
 echo $boot
 sudo mkfs.vfat $boot
 mkdir boot
@@ -108,7 +108,7 @@ else
     root="/dev/$(echo $device)2"
 fi
 
-umount $root
+sudo umount $root
 sudo mkfs.ext4 $root
 mkdir root
 sudo mount $root root
@@ -120,8 +120,7 @@ fi
 sudo bsdtar -xpf $arch_ver -C root
 sudo sync
 
-sudo ls root
-sudo echo $name > root/etc/hostname
+sudo sed -i "s/alarmpi/$name/g" root/etc/hostname
 
 sudo mv root/boot/* boot/
 sudo umount boot root
