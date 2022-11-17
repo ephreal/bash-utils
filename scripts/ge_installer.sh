@@ -20,7 +20,7 @@ versions=(
 # Note: These new versions are versions that use the new naming scheme for proton
 
 newversions=(
-    "7-18"
+    "7-37" # Warframe
 )
 
 # This is how I would prefer to have these run... that way all I need to do is

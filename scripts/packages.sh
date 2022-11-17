@@ -1,32 +1,16 @@
 #!/bin/bash
 
-# This downloads and installs all system76 packages from the archlinux AUR
-# that I'd like to have. This could easily be adapted to install any AUR
-# package provided the dependencies install without requiring an AUR package
-# as a dependency.
+# This downloads and installs the AUR packages that I use on a regular basis.
 
-# This is split into it's own separate file as not every device I have comes
-# from system76.
 
-# Package list of all system76 packages I'd like
 pkgs=(
-        "firmware-manager-git"
-        "pm-utils"
-        "system76-acpi-dkms"
-        "system76-dkms"
-        "system76-firmware-daemon"
-        "system76-driver"
-        "system76-io-dkms"
-        "system76-oled"
-        "system76-power"
-        "system76-wallpapers"
-# I might try using this some time....
-#        "gnome-control-center-system76"
+        "tor-browser"
+        "expressvpn"
+        "expressvpn-gui"
+        "minecraft-launcher"
+        "plex-media-player"
      )
 
-
-# Install a useful package for system76-driver before continuing
-pacman -S xorg-xbacklight
 
 function download_and_install() {
     # I'd like to give the parameter a decent name....
@@ -49,6 +33,7 @@ function download_and_install() {
     cd ..
 }
 
+
 function sudo_refresh() {
     # Gets forked to periodically run sudo -v. This prevents having to put in
     # your password from time to time.
@@ -63,7 +48,6 @@ function sudo_refresh() {
         sudo -v
     done
 }
-
 
 # Place these inside a separate folder so I can delete them all at the end if I
 # need. Not deleting them as I go along in case one of them fails to install
@@ -100,15 +84,3 @@ for pkg in ${pkgs[@]}; do
 done
 
 cd ..
-
-# Start and enable any necessary services
-sudo systemctl start system76.service
-sudo systemctl start system76-firmware-daemon.service
-sudo systemctl start system76-power.service
-
-sudo systemctl enable system76.service
-sudo systemctl enable system76-firmware-daemon.service
-sudo systemctl enable system76-power.service
-
-# Load the system76 module as well
-sudo modprobe system76
