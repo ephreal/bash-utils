@@ -1,0 +1,20 @@
+# Maintainer: Ephreal
+
+pkgname="telas2"
+pkgver="0.5.0"
+pkgrel=1
+pkgdesc="dodge asteroids and fight bosses in a space ship!"
+arch=("x86_64")
+url="https://portfolio.needs.management/games/Telas%202.0/"
+license=('MIT')
+makedepends=('wget')
+source=("Telas2.0::https://portfolio.needs.management/games/Telas%202.0/Linux.zip")
+sha256sums=('a66c7b0f40222b70ca971907f5ab34f0d24cbef34bad1d23257a3f39d384623c')
+
+package() {
+    mkdir -p "$pkgdir/usr/bin"
+    mkdir -p "$pkgdir/opt/Telas2.0"
+    echo "/opt/Telas2.0/Telas2.0.x86_64" > "$pkgdir/usr/bin/telas2"
+    chmod +x "$pkgdir/usr/bin/telas2"
+    cp -r Linux/* "$pkgdir/opt/Telas2.0/"
+}

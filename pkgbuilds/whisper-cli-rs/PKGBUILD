@@ -1,0 +1,28 @@
+# Maintainer: Ephreal
+
+pkgname="whisper-cli-rs-git"
+pkgver="0.1.4"
+pkgrel=1
+pkgdesc="A command-line tool for speech-to-text powered by openai's whisper"
+arch=("any")
+url="https://github.com/m1guelpf/whisper-cli-rs"
+license=('MIT')
+makedepends=('rust')
+source=("whisper-cli-rs::git+https://github.com/m1guelpf/whisper-cli-rs")
+sha256sums=('SKIP')
+
+prepare() {
+    cd whisper-cli-rs
+    echo "" >> Cargo.toml
+    echo "[profile.release]" >> Cargo.toml
+    echo "opt-level = 3" >> Cargo.toml
+    cd src
+    sed -i "s:/datasets::g" model.rs
+    cargo build --release
+}
+
+package() {
+    cd whisper-cli-rs
+    mkdir -p "$pkgdir/usr/bin"
+    cp target/release/whisper $pkgdir/usr/bin/
+}
