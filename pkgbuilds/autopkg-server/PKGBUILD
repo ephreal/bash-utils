@@ -1,7 +1,7 @@
 # Maintainer: Ephreal
 
 pkgname="autopkg-server"
-pkgver="0.1.1"
+pkgver="0.1.2"
 pkgrel=1
 pkgdesc="Automatically build and store packages for archlinux"
 arch=("x86_64")
@@ -9,11 +9,18 @@ url="https://gitlab.needs.management/ephreal/autopkg-server"
 license=('MIT')
 makedepends=('rust')
 source=("${url}/-/archive/${pkgver}/${pkgname}-${pkgver}.zip")
-sha256sums=('6c04c1843a6de9cfa6768684aa6db215d7c45f81b1b904d874f45b48befcc5e1')
+sha256sums=('28cf2763a7b34b8d1ac563e8ef396f5a20e5dcd336e4e70957163d20802d0cdd')
+
+backup=(
+    "etc/autopkg/autopkg-server.json"
+    "etc/autopkg/builds.json"
+)
 
 prepare() {
     echo "$pkgname-$pkgver"
-    cd "$pkgname-$pkgver"
+    cd "$pkgname-$pkgver/src"
+    
+#    sed -i "s/24/8/g" server.rs
     cargo build --release
 }
 
