@@ -1,0 +1,48 @@
+# Maintainer: Ephreal
+
+pkgname="autopkg-server"
+pkgver="0.1.1"
+pkgrel=1
+pkgdesc="Automatically build and store packages for archlinux"
+arch=("x86_64")
+url="https://gitlab.needs.management/ephreal/autopkg-server"
+license=('MIT')
+makedepends=('rust')
+source=("${url}/-/archive/${pkgver}/${pkgname}-${pkgver}.zip")
+sha256sums=('6c04c1843a6de9cfa6768684aa6db215d7c45f81b1b904d874f45b48befcc5e1')
+
+prepare() {
+    echo "$pkgname-$pkgver"
+    cd "$pkgname-$pkgver"
+    cargo build --release
+}
+
+package() {
+    cd "$pkgname-$pkgver"
+    mkdir -p "$pkgdir/usr/bin"
+    mkdir -p "$pkgdir/etc/autopkg"
+    mkdir -p "$pkgdir/etc/systemd/system"
+    mkdir -p "$pkgdir/etc/autopkg/builds"
+
+    chmod 666 "$pkgdir/etc/autopkg/builds"
+
+    cp target/release/$pkgname $pkgdir/usr/bin
+    cp src/autopkg-server-example.json $pkgdir/etc/autopkg/autopkg-server.json
+    cp src/builds.json $pkgdir/etc/autopkg/builds.json
+
+    echo "[Unit] 
+Description=Autopkg Server Service
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+Restart=on-failure
+RestartSec=10
+User=root
+WorkingDirectory=/usr/bin
+ExecStart=/usr/bin/autopkg-server
+
+[Install]
+WantedBy=multi-user.target" >> $pkgdir/etc/systemd/system/autopkg-server.service
+}
