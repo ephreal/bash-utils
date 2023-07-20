@@ -1,15 +1,20 @@
 # Maintainer: Ephreal
 
 pkgname="autopkg-agent"
-pkgver="0.1.1"
+pkgver="0.2.0"
 pkgrel=1
 pkgdesc="Automatically build and store packages for archlinux"
 arch=("x86_64")
 url="https://gitlab.needs.management/ephreal/autopkg-agent"
+install="$pkgname.install"
 license=('MIT')
 makedepends=('rust')
 source=("${url}/-/archive/${pkgver}/${pkgname}-${pkgver}.zip")
-sha256sums=('b67ebd2b5986c0671a422d1a6249f12f1a5517a4d326dbf4d6b2c90fc1721e80')
+sha256sums=('e560c14fb2dc63568d0d1574b2f60fc47085735fdea72b373a2a2b4997f3364e')
+
+backup=(
+    "etc/autopkg/autopkg-agent.json"
+)
 
 prepare() {
     echo "$pkgname-$pkgver"
@@ -35,7 +40,7 @@ After=network.target network-online.target
 Type=simple
 Restart=on-failure
 RestartSec=10
-User=root
+User=autopkg
 WorkingDirectory=/usr/bin
 ExecStart=/usr/bin/autopkg-agent
 

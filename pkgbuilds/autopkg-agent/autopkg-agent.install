@@ -1,0 +1,14 @@
+post_install () {
+    # Check to see if the autopkg user exists
+    if [[ $(id autopkg) == "" ]]; then 
+        echo "==> Creating autopkg user"
+        useradd -s /usr/bin/nologin autopkg
+    fi
+    echo "==> Ensure the build_dir in /etc/autopkg/autopkg-agent.conf is writable"
+    echo "    by the user autopkg. This is /tmp/builds by default."
+}
+
+post_upgrade () {
+  post_install $1
+}
+
