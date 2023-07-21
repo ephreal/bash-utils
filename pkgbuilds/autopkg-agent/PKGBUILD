@@ -1,7 +1,7 @@
 # Maintainer: Ephreal
 
 pkgname="autopkg-agent"
-pkgver="0.2.0"
+pkgver="0.3.1"
 pkgrel=1
 pkgdesc="Automatically build and store packages for archlinux"
 arch=("x86_64")
@@ -10,7 +10,7 @@ install="$pkgname.install"
 license=('MIT')
 makedepends=('rust')
 source=("${url}/-/archive/${pkgver}/${pkgname}-${pkgver}.zip")
-sha256sums=('e560c14fb2dc63568d0d1574b2f60fc47085735fdea72b373a2a2b4997f3364e')
+sha256sums=('a96c3137ac666fea92760ae360a653222d9d3ec8627369656a42527af409761d')
 
 backup=(
     "etc/autopkg/autopkg-agent.json"
@@ -27,6 +27,7 @@ package() {
     mkdir -p "$pkgdir/usr/bin"
     mkdir -p "$pkgdir/etc/autopkg"
     mkdir -p "$pkgdir/etc/systemd/system"
+    mkdir -p "$pkgdir/var/autopkg/cargo_cache"
 
     cp target/release/$pkgname $pkgdir/usr/bin
     cp src/autopkg-agent-example.json $pkgdir/etc/autopkg/autopkg-agent.json
@@ -41,6 +42,7 @@ Type=simple
 Restart=on-failure
 RestartSec=10
 User=autopkg
+Environment="CARGO_HOME=/var/autopkg/cargo_cache"
 WorkingDirectory=/usr/bin
 ExecStart=/usr/bin/autopkg-agent
 
