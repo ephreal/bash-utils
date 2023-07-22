@@ -1,7 +1,7 @@
 # Maintainer: Ephreal
 
 pkgname="autopkg-server"
-pkgver="0.3.0"
+pkgver="0.3.1"
 pkgrel=1
 pkgdesc="Automatically build and store packages for archlinux"
 arch=("x86_64" "armv7h")
