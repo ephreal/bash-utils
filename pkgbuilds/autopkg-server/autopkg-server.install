@@ -19,7 +19,7 @@ post_install () {
     fi
 
     # Check to see if the default builds directory is owned by the correct user
-    if [[ $(stat --format '%U') != "autopkg" ]]; then
+    if [[ $(stat --format '%U' /etc/autopkg/builds) != "autopkg" ]]; then
 
         echo "==> Ensuring the default build_dir in /etc/autopkg/autopkg-agent.conf"
         echo "    is writable by the user autopkg. This is /etc/autopkg/builds by default."
