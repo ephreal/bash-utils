@@ -1,0 +1,35 @@
+post_install () {
+    # Check to see if the autopkg user exists
+    if [[ $(id autopkg) == "" ]]; then 
+        echo "==> Creating autopkg user"
+        useradd -s /usr/bin/nologin autopkg
+    fi
+
+    # Check to see if the daemon has been updated and needs to be reloaded
+    # This will restart the service if it is currently running as well.
+    if [[ $(systemctl show autopkg-server | grep NeedDaemonReload) =~ "yes" ]]; then
+        echo "==> Daemon has changed, reloading on disk"
+       systemctl daemon-reload
+
+        if [[ $(systemctl is-active autopkg-server) == "active" ]]; then 
+            echo "==> augopkg-server service is running. Restarting for service changes"
+            echo "    to take effect."
+            systemctl restart autopkg-server
+        fi
+    fi
+
+    # Check to see if the default builds directory is owned by the correct user
+    if [[ $(stat --format '%U') != "autopkg" ]]; then
+
+        echo "==> Ensuring the default build_dir in /etc/autopkg/autopkg-agent.conf"
+        echo "    is writable by the user autopkg. This is /etc/autopkg/builds by default."
+        echo "    chown -R autopkg <build_dir> if you have changed this."
+
+        chown -R autopkg /etc/autopkg/builds
+    fi
+}
+
+post_upgrade () {
+  post_install $1
+}
+

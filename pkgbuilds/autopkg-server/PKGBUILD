@@ -2,10 +2,11 @@
 
 pkgname="autopkg-server"
 pkgver="0.3.2"
-pkgrel=1
+pkgrel=2
 pkgdesc="Automatically build and store packages for archlinux"
 arch=("x86_64" "armv7h")
 url="https://gitlab.needs.management/ephreal/autopkg-server"
+install="$pkgname.install"
 license=('MIT')
 makedepends=('rust')
 source=("${url}/-/archive/${pkgver}/${pkgname}-${pkgver}.zip")
@@ -46,7 +47,7 @@ After=network.target network-online.target
 Type=simple
 Restart=on-failure
 RestartSec=10
-User=root
+User=autopkg
 WorkingDirectory=/usr/bin
 ExecStart=/usr/bin/autopkg-server
 
