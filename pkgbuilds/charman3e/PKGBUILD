@@ -1,0 +1,22 @@
+# Maintainer: Ephreal
+
+pkgname="charman3e"
+_pkgname="CharMan3E"
+pkgver="0.5.0"
+pkgrel=1
+pkgdesc="A shadowrun 3E character creator"
+arch=("x86_64")
+url="https://shadowrun.needs.management/charman3e"
+license=('MIT')
+makedepends=('wget')
+source=("$url/releases/$pkgver/Linux/$_pkgname-$pkgver.zip")
+sha256sums=('98e587e88d69d06304b642968ab18f022c79a8da8050ba6f100ab7b85be60875')
+
+package() {
+    mkdir -p "$pkgdir/usr/bin"
+    mkdir -p "$pkgdir/opt/$pkgname"
+    echo "/opt/$pkgname/$_pkgname-$pkgver.x86_64" > "$pkgdir/usr/bin/$pkgname"
+    chmod +x "$pkgdir/usr/bin/$pkgname"
+    cp "./$_pkgname-$pkgver.x86_64" "$pkgdir/opt/$pkgname/"
+    cp "./$_pkgname-$pkgver.pck" "$pkgdir/opt/$pkgname/"
+}
