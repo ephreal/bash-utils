@@ -3,19 +3,28 @@
 pkgname="telas2"
 _pkgname="Telas2.0"
 pkgver="0.5.1"
-pkgrel=1
+pkgrel=2
 pkgdesc="dodge asteroids and fight bosses in a space ship!"
 arch=("x86_64")
 url="https://portfolio.needs.management/games/Telas%202.0/"
 license=('MIT')
 makedepends=('wget')
-source=("Telas2.0::https://portfolio.needs.management/games/Telas%202.0/Linux.zip")
-sha256sums=('4bb534f439a8a887c742a1b3ea225c2b012eb38ac9c6147e40db374265ab4130')
+source=("Telas2.0::https://portfolio.needs.management/games/Telas%202.0/Linux.zip"
+        "https://raw.githubusercontent.com/ephreal/bash-utils/master/pkgbuilds/telas2/telas2.png"
+        "https://raw.githubusercontent.com/ephreal/bash-utils/master/pkgbuilds/telas2/telas2.desktop"
+)
+sha256sums=('4bb534f439a8a887c742a1b3ea225c2b012eb38ac9c6147e40db374265ab4130' # telas2.zip
+            '732da0bc3cc64d327d17694f007460a191e2b34ec930d45da3f5da12b2487a52' # telas2.png
+            'a79308daec816f3bdec06d3271f2cf45c2f313c3fc1cab1adb68c3cdce6d39c3' # telas2.desktop
+)
 
 package() {
     mkdir -p "$pkgdir/usr/bin"
+    mkdir -p "$pkgdir/usr/share/applications"
     mkdir -p "$pkgdir/opt/$_pkgname"
     echo "/opt/Telas2.0/$_pkgname.x86_64" > "$pkgdir/usr/bin/telas2"
     chmod +x "$pkgdir/usr/bin/telas2"
     cp -r Linux/* "$pkgdir/opt/$_pkgname"
+    cp "$pkgdir/../../telas2.png" "$pkgdir/opt/$_pkgname/"
+    cp "$pkgdir/../../telas2.desktop" "$pkgdir/usr/share/applications/"
 }
