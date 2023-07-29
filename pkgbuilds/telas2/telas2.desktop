@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Telas2
+StartupWMClass=telas2
+Comment=Dodge asteroids in Space!
+GenericName=Space Flight Game
+Exec=/usr/bin/telas2
+Icon=/opt/Telas2.0/telas2.png
+Type=Application
+Categories=Games;
+Path=/usr/bin
