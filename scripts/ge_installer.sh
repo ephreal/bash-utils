@@ -21,7 +21,7 @@ versions=(
 
 newversions=(
     "8-3"
-    "7-37" # Warframe
+    "8-11" # Warframe
 )
 
 # This is how I would prefer to have these run... that way all I need to do is

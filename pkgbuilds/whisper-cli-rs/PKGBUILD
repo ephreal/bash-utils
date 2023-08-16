@@ -1,23 +1,28 @@
 # Maintainer: Ephreal
 
 pkgname="whisper-cli-rs"
-pkgver="0.1.4"
+pkgver="0.1.5"
 pkgrel=1
 pkgdesc="A command-line tool for speech-to-text powered by openai's whisper"
 arch=("x86_64" "x86")
-url="https://github.com/m1guelpf/whisper-cli-rs"
+# url="https://github.com/m1guelpf/whisper-cli-rs"
+# Swapping to my repo since the original maintainer has not applied any of the fork
+# fixes in several months. I'd like to have this downloading the models and setting
+# timestamps properly. I'll change the URL back once the changes are applied.
+url="https://github.com/ephreal/whisper-cli-rs"
 license=('MIT')
 makedepends=('rust')
-source=("$url/archive/refs/tags/v$pkgver.zip")
-sha256sums=('eafcc4d582777f85509cc7777868fddd0f51a3e3e2107f4fe0cf3d77ba12d64b')
+# source=("$url/archive/refs/tags/v$pkgver.zip")
+source=("$url/archive/refs/tags/$pkgver.zip")
+sha256sums=('b14d0c145c77e3dd822932ad4cb87033d31b8a88748a188137101e3f2e2a4954')
 
 prepare() {
     cd $pkgname-$pkgver
-    echo "" >> Cargo.toml
-    echo "[profile.release]" >> Cargo.toml
-    echo "opt-level = 3" >> Cargo.toml
+#    echo "" >> Cargo.toml
+#    echo "[profile.release]" >> Cargo.toml
+#    echo "opt-level = 3" >> Cargo.toml
     cd src
-    sed -i "s:/datasets::g" model.rs
+#    sed -i "s:/datasets::g" model.rs
     cargo build --release
 }
 
