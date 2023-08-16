@@ -1,7 +1,7 @@
 # Maintainer: Ephreal
 
 pkgname="whisper-cli-rs"
-pkgver="0.1.5"
+pkgver="0.1.6"
 pkgrel=1
 pkgdesc="A command-line tool for speech-to-text powered by openai's whisper"
 arch=("x86_64" "x86")
@@ -14,7 +14,7 @@ license=('MIT')
 makedepends=('rust')
 # source=("$url/archive/refs/tags/v$pkgver.zip")
 source=("$url/archive/refs/tags/$pkgver.zip")
-sha256sums=('b14d0c145c77e3dd822932ad4cb87033d31b8a88748a188137101e3f2e2a4954')
+sha256sums=('910c4395d596f5aeabbef997b8b7c3b5716c919620c37468a390b993ef01031b')
 
 prepare() {
     cd $pkgname-$pkgver
