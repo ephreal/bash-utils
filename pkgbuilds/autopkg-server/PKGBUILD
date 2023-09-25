@@ -1,7 +1,7 @@
 # Maintainer: Ephreal
 
 pkgname="autopkg-server"
-pkgver="0.3.2"
+pkgver="0.3.3"
 pkgrel=2
 pkgdesc="Automatically build and store packages for archlinux"
 arch=("x86_64" "armv7h")
@@ -10,7 +10,7 @@ install="$pkgname.install"
 license=('MIT')
 makedepends=('rust')
 source=("${url}/-/archive/${pkgver}/${pkgname}-${pkgver}.zip")
-sha256sums=('3655de5ea49e3801cbcedc4f563c2c77662a52522e43a909412cd959f1fac80c')
+sha256sums=('47d504b7443fa339483deff355616ddfe4119eff9ddce571efb09672a0ba8f05')
 
 backup=(
     "etc/autopkg/autopkg-server.json"
