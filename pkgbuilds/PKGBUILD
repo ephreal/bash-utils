@@ -1,0 +1,92 @@
+# Maintainer: Ephreal
+
+pkgname="freesft"
+pkgver="1.0.0"
+pkgrel=1
+pkgdesc="A collection of free soundfonts from archive.org"
+arch=("x86_64" "armv7h")
+url="https://archive.org/download/free-soundfonts-sf2-2019-04"
+license=('MIT')
+source=(
+    "${url}/Arachno_SoundFont_Version_1.0.sf2"
+    "${url}/CREATIVE_28MBGM.sf2"
+    "${url}/CT2MGM.SF2"
+    "${url}/Creative%20(emu10k1)8MBGMSFX.SF2"
+    "${url}/DSoundFontV4.sf2"
+    "${url}/FMSynthesis1.40.sf2"
+    "${url}/FatBoy-v0.786.sf2"
+    "${url}/Florestan_Basic_GM_GS.sf2"
+    "${url}/FluidR3_GM2-2.SF2"
+    "${url}/GMExtBank.SF2"
+    "${url}/GXSCC_gm_033.sf2"
+    "${url}/GeneralUser%20GS%20v1.471.sf2"
+    "${url}/Jurgen_GM_GS_Bank.sf2"
+    "${url}/MuseScore_General(v0.1.3).sf2"
+    "${url}/Musica_Theoria_v2_(GM).sf2"
+    "${url}/Nintendo_64_ver_2.0.sf2"
+    "${url}/Roland_SC-55.sf2"
+    "${url}/Roland_SC-88.sf2"
+    "${url}/airfont_340.sf2"
+    "${url}/airfont_380_final.sf2"
+    "${url}/merlin_grand(v5.37).sf2"
+)
+
+sha256sums=(
+    '9a57fb3b6714e69dda12390e351b087e81fc3b1eca15c6b4bbe172799f4cf3cd'
+    '3e5b1d704f9d252a85200cd3878b4c9ea46d6fcb5bfd54eb5edec1a70b01c6ca'
+    'cfa4b5899f118208b2a98b5cc0dd35a81d94b5ac4b44e4652308c2d5aa0d646f'
+    '6c2ff6e9219989e0a2d39e633cbdc7d8f8a575903985160495aeab5d01cc48e6'
+    '01815e87817138cc30e798152d3cc66991f853305eac34660bb588437c09fee4'
+    '26c4d802da653782c62dd398c5c4f57aa24f75233f93e6a7a828583fa84f939b'
+    '8aac3471ea8873b6526325918fff5c83008dccecdc89ecc88d32a7205289307e'
+    '6cc153f925bc3c0136d431802bd0039587dd3b3ef4a05b2e9d316c48f41a0363'
+    '2ae766ab5c5deb6f7fffacd6316ec9f3699998cce821df3163e7b10a78a64066'
+    '72da8e89286a63b1a02cbb972c1c0752b6b235325064b2e9a531a84a546f27f3'
+    'daed002f2866eceb3895b3b61b43dc804336e1f0ce3e98d881b2689baf95c242'
+    'f45b6b4a68b6bf3d792fcbb6d7de24dc701a0f89c5900a21ef3aaece993b839a'
+    '59b6ac2437fd769b2fd77948f4e07c3f2def4c74e9534ddf2a5a8baabc80d9a9'
+    '8520f85bd115d51be327736584fd2b0ccced1ec786636fc2139efea2d714a5b4'
+    'ee84e2c7dad370bca1cbd27d2a2847058ba5afe2a3f15148447fdcc4323d1e20'
+    '9979a7dea52892c2eb4a7a234af6df04b1edc39213519881b06c0fe0797c8b0f'
+    'a6ce98b03dd7899a7555d184f18bcd8299646f804bb5b509b8152b94f5c49037'
+    'a40d9291194df240b68bb367f97aaac70fa2ac16b526ad713ab9b6c0ca5236a4'
+    '26b19d395d2df88af0e8a09f815ae661524e6019d50f862cbd628c11057c9bb1'
+    '9dd093c0f4829be8715ed407deba1d15158af28901a133349a196dd750d1a6f5'
+    '2d959eeddda4186abdb48604b91d9864158be8e545f42a5c96a4fcee9925e9b2'
+)
+
+package() {
+    _sftdir="${pkgdir}/usr/share/soundfonts/freesft"
+    echo $_sftdir
+    mkdir -p $_sftdir
+
+    # Manually copying in order to rename the files to something
+    # I prefer a little more.
+
+ 
+    cp Arachno_SoundFont_Version_1.0.sf2 "${_sftdir}/Arachno-v1.0.sf2"
+    cp CREATIVE_28MBGM.sf2 "${_sftdir}/Creative-GM.sf2"
+    cp CT2MGM.SF2 "${_sftdir}/CT-GM.sf2"
+    cp "Creative%20(emu10k1)8MBGMSFX.SF2" "${_sftdir}/CreativeSFX-GM.sf2"
+    cp DSoundFontV4.sf2 "${_sftdir}/DSoundfont-v4.sf2"
+    cp FMSynthesis1.40.sf2 "${_sftdir}/FMSynthesis-v1.4.sf2"
+    cp FatBoy-v0.786.sf2 "${_sftdir}/Fatboy-0.786.sf2"
+    cp Florestan_Basic_GM_GS.sf2 "${_sftdir}/FlorestanBasic-GM_GS.sf2"
+    cp FluidR3_GM2-2.SF2 "${_sftdir}/FluidR3-GM.sf2"
+    cp GMExtBank.SF2 "${_sftdir}/ExtBank-GM.sf2"
+    cp GXSCC_gm_033.sf2 "${_sftdir}/GXSCC-GM.sf2"
+    cp "GeneralUser%20GS%20v1.471.sf2" "${_sftdir}/GeneralUser-GS-v1.47.1.sf2"
+    cp Jurgen_GM_GS_Bank.sf2 "${_sftdir}/Jurgen-GM_GS.sf2"
+    cp "MuseScore_General(v0.1.3).sf2" "${_sftdir}/MuseScore-v0.1.3.sf2"
+    cp "Musica_Theoria_v2_(GM).sf2" "${_sftdir}/MusicaTheoria-GM-v2.sf2"
+    cp Nintendo_64_ver_2.0.sf2 "${_sftdir}/Nintendo64-v2.0.sf2"
+    cp Roland_SC-55.sf2 "${_sftdir}/Roland55.sf2"
+    cp Roland_SC-88.sf2 "${_sftdir}/Roland88.sf2"
+    cp airfont_340.sf2 "${_sftdir}/Airfont340.sf2"
+    cp airfont_380_final.sf2 "${_sftdir}/Airfont380.sf2"
+    cp "merlin_grand(v5.37).sf2" "${_sftdir}/MerlinGrand-5.37.sf2"
+
+#    cp *.sf2 $pkgdir/usr/share/soundfonts/freesft/
+#    cp *.SF2 $pkgdir/usr/share/soundfonts/freesft/
+
+}
