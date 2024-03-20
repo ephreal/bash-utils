@@ -9,8 +9,16 @@ arch=("x86_64")
 url="https://shadowrun.needs.management/charman3e"
 license=('MIT')
 makedepends=('wget')
-source=("$url/releases/$pkgver/Linux/$_pkgname-$pkgver.zip")
-sha256sums=('98e587e88d69d06304b642968ab18f022c79a8da8050ba6f100ab7b85be60875')
+source=(
+        "$url/releases/$pkgver/Linux/$_pkgname-$pkgver.zip"
+        "https://raw.githubusercontent.com/ephreal/bash-utils/master/pkgbuilds/charman3e/charman3e.desktop"
+        "https://raw.githubusercontent.com/ephreal/bash-utils/master/pkgbuilds/charman3e/charman3e.png"
+       )
+sha256sums=(
+            '98e587e88d69d06304b642968ab18f022c79a8da8050ba6f100ab7b85be60875'
+            'd5e5b82b4814bc75eb2a1af60b0803dd399230791206f7e159cbaf4017f67549'
+            '5bbe2208f81f3b5b1ddc90548058114a8294f1c1b73713326188400b66470ea9'
+        )
 
 package() {
     # Required directories
