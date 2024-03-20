@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Charman3E
+StartupWMClass=charman3e
+Comment=Shadowrun Third Edition Character Tool
+GenericName=SR3E Character Tool
+Exec=/usr/bin/charman3e
+Icon=/opt/charman3e/charman3e.png
+Type=Application
+Categories=Games;
+Path=/usr/bin
