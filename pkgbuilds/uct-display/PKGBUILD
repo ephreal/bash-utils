@@ -2,7 +2,7 @@
 
 pkgname="uct-display"
 pkgver="1.0.0"
-pkgrel=1
+pkgrel=2
 pkgdesc="Allows the UCTronics Rackmount RPI display to function"
 arch=('armv7h')
 url="https://github.com/UCTRONICS/U6143_ssd1306"
@@ -13,6 +13,8 @@ prepare() {
     cd ${srcdir}
     git clone $url $pkgname
 
+    # Change the units to celsius and redefine the ethernet port for the raspberry pi
+    # On arch, the port is end0, not eth0.
     cd $pkgname/C
     sed -i "s/#define TEMPERATURE_TYPE  FAHRENHEIT/#define TEMPERATURE_TYPE CELSIUS/g" ssd1306_i2c.h
     sed -i "s/eth0/end0/g" ssd1306_i2c.c
@@ -24,6 +26,11 @@ package() {
     install -d "${pkgdir}/usr/bin/"
     cp "${srcdir}/${pkgname}/C/display" "${pkgdir}/usr/bin/${pkgname}"
 
+    # Includes a uct-display service that can be enabled/started
     install -d "${pkgdir}/etc/systemd/system"
     cp "${srcdir}/../uct-display.service" "${pkgdir}/etc/systemd/system/"
+
+    # Adds a module entry for i2c-dev
+    install -d "${pkgdir}/etc/modules-load.d/"
+    cp "${srcdir}/../i2c-dev.conf" "${pkgdir}/etc/modules-load.d/"
 }

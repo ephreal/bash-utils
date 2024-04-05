@@ -74,7 +74,7 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | sudo fdisk /dev/$device
     p # Primary Partition 
     1 # Partition number 1
       # Confirm default start position (newline)
-    +200M # Make partition 1 200M in size
+    +400M # Make partition 1 200M in size
     t # Set the partition type
     c # Choose the partition type W95 FAT32
     n # New partition
@@ -90,7 +90,8 @@ if [ $dev_selection == "sd-card" ]
 then
     boot="/dev/$(echo $device)p1"
 else
-    boot="/dev/$(echo $device)1"
+    # boot="/dev/$(echo $device)1"
+    boot="/dev/${device}1"
 fi
 
 # Ensure boot is unmounted. Some desktop environments automatically mount partitions
