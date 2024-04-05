@@ -1,0 +1,29 @@
+#Maintainer: Ephreal <contact@mylifeneeds.management>
+
+pkgname="uct-display"
+pkgver="1.0.0"
+pkgrel=1
+pkgdesc="Allows the UCTronics Rackmount RPI display to function"
+arch=('armv7h')
+url="https://github.com/UCTRONICS/U6143_ssd1306"
+license=('unknown')
+
+prepare() {
+    echo "Cloning git repo"
+    cd ${srcdir}
+    git clone $url $pkgname
+
+    cd $pkgname/C
+    sed -i "s/#define TEMPERATURE_TYPE  FAHRENHEIT/#define TEMPERATURE_TYPE CELSIUS/g" ssd1306_i2c.h
+    sed -i "s/eth0/end0/g" ssd1306_i2c.c
+    make
+}
+
+package() {
+    # Install the executable
+    install -d "${pkgdir}/usr/bin/"
+    cp "${srcdir}/${pkgname}/C/display" "${pkgdir}/usr/bin/${pkgname}"
+
+    install -d "${pkgdir}/etc/systemd/system"
+    cp "${srcdir}/../uct-display.service" "${pkgdir}/etc/systemd/system/"
+}

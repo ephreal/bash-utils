@@ -1,0 +1,11 @@
+[Unit]
+Description=UCTronics LCD display service
+After=syslog.target
+
+[Service]
+ExecStart=/usr/bin/uct-display
+Restart=always
+
+[Install]
+Alias=uct-display.service
+WantedBy=multi-user.target
