@@ -1,0 +1,25 @@
+# Maintainer: Ephreal
+
+pkgname="warframe-weapons"
+pkgver="1.0.0"
+pkgrel=1
+pkgdesc="A Warframe Lich/Sister of Parvos weapon tracker"
+arch=("x86_64")
+url="https://github.com/ephreal/warframe-weapons"
+license=('MIT')
+makedepends=('wget')
+source=("${url}/releases/download/1.0.0/warframe-weapons")
+sha256sums=('7dfc6a8a617c015c6aa99a6e56262da696e143edbea774cf0b2d1773df7ba039')
+
+package() {
+    # Executable Placement
+    mkdir -p "${pkgdir}/usr/bin"
+    cp "./${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+    chmod +x "${pkgdir}/usr/bin/${pkgname}"
+
+    # Desktop Item Setup
+    mkdir -p "${pkgdir}/opt"
+    mkdir -p "${pkgdir}/usr/share/applications"
+    cp "${pkgdir}/../../${pkgname}.desktop" "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+    cp "${pkgdir}/../../${pkgname}.png" "${pkgdir}/opt/${pkgname}.png"
+}

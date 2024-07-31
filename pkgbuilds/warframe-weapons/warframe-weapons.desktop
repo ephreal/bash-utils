@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Warframe Weapon Tracker
+StartupWMClass=warframe-weapon
+Comment=Warframe Lich/Sister Weapon Tracker
+GenericName=SR3E Character Tool
+Exec=/usr/bin/charman3e
+Icon=/opt/warframe-weapons.png
+Type=Application
+Categories=Games;
+Path=/usr/bin
