@@ -1,7 +1,7 @@
 # Maintainer: Ephreal
 
 pkgname="warframe-weapons"
-pkgver="1.0.0"
+pkgver="1.0.1"
 pkgrel=2
 pkgdesc="A Warframe Lich/Sister of Parvos weapon tracker"
 arch=("x86_64")
@@ -9,12 +9,12 @@ url="https://github.com/ephreal/warframe-weapons"
 license=('MIT')
 makedepends=('wget')
 source=(
-        "${url}/releases/download/1.0.0/warframe-weapons"
+        "${url}/releases/download/${pkgver}/warframe-weapons"
         "https://raw.githubusercontent.com/ephreal/warframe-weapons/main/packaging/pkgbuild/warframe-weapons.desktop"
         "https://raw.githubusercontent.com/ephreal/warframe-weapons/main/packaging/pkgbuild/warframe-weapons.png"
 )
 sha256sums=(
-            '7dfc6a8a617c015c6aa99a6e56262da696e143edbea774cf0b2d1773df7ba039'
+            '388a42b83949c7160ec134597bb9c33a63df24ff8d13898b6e38f396233e0d56'
             '921a7a622c911b175793f4c7f2013e4c2c35d7f1ceb4e3ba98d50452ce798dae'
             '6d164a0e527da24e6e82f3ea7057cb27c958fa818977a551e5f2016a8d5ed44c'
 )
