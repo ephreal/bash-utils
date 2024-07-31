@@ -8,8 +8,16 @@ arch=("x86_64")
 url="https://github.com/ephreal/warframe-weapons"
 license=('MIT')
 makedepends=('wget')
-source=("${url}/releases/download/1.0.0/warframe-weapons")
-sha256sums=('7dfc6a8a617c015c6aa99a6e56262da696e143edbea774cf0b2d1773df7ba039')
+source=(
+        "${url}/releases/download/1.0.0/warframe-weapons"
+        "https://raw.githubusercontent.com/ephreal/warframe-weapons/main/packaging/pkgbuild/warframe-weapons.desktop"
+        "https://raw.githubusercontent.com/ephreal/warframe-weapons/main/packaging/pkgbuild/warframe-weapons.png"
+)
+sha256sums=(
+            '7dfc6a8a617c015c6aa99a6e56262da696e143edbea774cf0b2d1773df7ba039'
+            '921a7a622c911b175793f4c7f2013e4c2c35d7f1ceb4e3ba98d50452ce798dae'
+            '6d164a0e527da24e6e82f3ea7057cb27c958fa818977a551e5f2016a8d5ed44c'
+)
 
 package() {
     # Executable Placement
