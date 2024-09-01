@@ -1,6 +1,8 @@
 # Leave just ONE of these uncommented to choose your raspi archlinux version
 arch_ver=ArchLinuxARM-rpi-armv7-latest.tar.gz
 
+# Archlinux for Raspi 4+ and Raspi 5
+# arch_ver=ArchLinuxARM-rpi-aarch64-latest.tar.gz
 
 # Packages that I need installed after the base install completes
 # These are not installed automatically *yet*. They will be
