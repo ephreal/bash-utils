@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Starship64
+StartupWMClass=Starship64
+Comment=A Nostalgic Shooter on Rails from the N64
+GenericName=Starship
+Exec=/opt/starship64/launcher.sh
+Icon=/usr/share/icons/starship64.png
+Type=Application
+Categories=Games;
+Path=/usr/bin

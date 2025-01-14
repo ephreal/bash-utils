@@ -20,8 +20,8 @@ versions=(
 
 newversions=(
     "8-3"
-    "9-5" # Warframe - Known Working
-    "9-11" # Warframe - Experimental
+    "9-11" # Warframe - Known Working
+    "9-22" # Warframe - Experimental
 )
 
 # This is how I would prefer to have these run... that way all I need to do is

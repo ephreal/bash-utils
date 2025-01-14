@@ -1,0 +1,92 @@
+# Maintainer: Ephreal
+# Note: You must provide your own 'baserom.z64'.
+# It MUST match the sha256sum that the PKGBUILD has.
+# If it does not, this may or may not work.
+# Check https://github.com/HarbourMasters/starship for a list of valid files.
+
+pkgname="starship64"
+pkgver="1.0.0"
+pkgrel="1"
+pkgdesc="Native Port of Starfox 64"
+arch=('x86_64')
+url="https://github.com/HarbourMasters/starship"
+license=('MIT')
+# Don't strip debugging symbols from this.
+# This builds in debug mode currently.
+options=(!strip)
+source=(
+    'file://baserom.z64'
+    'file://starship64.png'
+    'file://starship64.desktop'
+    'file://launcher.sh'
+    'file://Starship.log'
+    'file://default.sav'
+    'file://starship.cfg.json'
+    'https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/refs/heads/master/gamecontrollerdb.txt'
+)
+makedepends=('boost' 'clang' 'cmake' 'libpng' 'libzip' 'lsb-release' 'nlohmann-json' 'sdl2' 'sdl2_net' 'spdlog' 'tinyxml2')
+sha256sums=(
+    '385bcf1901ed12fb1152f3c227d1968cc54ae41e8566da66695df71af40a573f'
+    '9b5f1e416c7f087f37d3ad138f79e6c58f8a4f432272d1288c7360c592d04482'
+    'e376b9f3f37b3196459168ca074dca0ab4e48c028f73b7126f880586877eb63d'
+    '529cef40547fbb52552f0c34e1437e8c7e73eaf8f958e975fc42ef07bc04f691'
+    'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+    'd29a2c96802e416491746959bd51e4caed84013e7054beafada6280ecd089a6b'
+    'bac66ba4777f6b4504023342e033a2869bad76428986397f9549094ea4de2ad5'
+    '934689558db37c13ebcc3c8240339a9b5d72e28161dca3a3577f28667e501dd7'
+)
+
+prepare() {
+    echo "Preparing package for build"
+    echo "Cloning git repo"
+    cd ${srcdir}
+    git clone $url $pkgname
+    cp baserom.z64 ${pkgname}/baserom.z64
+    cd ${pkgname}
+
+    echo "Cloning submodules"
+    git submodule update --init
+
+    echo "Beginning build"
+    # Generate Ninja project
+    # Add `-DCMAKE_BUILD_TYPE:STRING=Release` if you're packaging
+    # Add `-DPython3_EXECUTABLE=$(which python3)` if you are using non-standard Python installations such as PyEnv
+    # cmake -H. -Bbuild-cmake -GNinja -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+    # cmake -H. -Bbuild-cmake -GNinja -DCMAKE_BUILD_TYPE:STRING:Release
+    cmake -H. -Bbuild-cmake -GNinja
+
+    # Generate sf64.otr
+    cmake --build build-cmake --target ExtractAssets
+
+    # Compile the project
+    # Add `--config Release` if you're packaging
+    # cmake --build build-cmake --config Release
+    cmake --build build-cmake
+}
+
+package() {
+    mkdir -p "${pkgdir}/opt/starship64"
+    mkdir -p "${pkgdir}/opt/starship64/logs"
+    mkdir -p "${pkgdir}/usr/share/icons"
+    mkdir -p "${pkgdir}/usr/share/applications"
+
+    cp "${srcdir}/${pkgname}/build-cmake/Starship" "${pkgdir}/opt/starship64/${pkgname}"
+    cp "${srcdir}/${pkgname}/build-cmake/sf64.otr" "${pkgdir}/opt/starship64/"
+    cp "${srcdir}/gamecontrollerdb.txt" "${pkgdir}/opt/starship64/"
+
+    # Copy in helper files that are used to provide saves, controller config, etc
+    cp "${srcdir}/launcher.sh" "${pkgdir}/opt/starship64/"
+    cp "${srcdir}/Starship.log" "${pkgdir}/opt/starship64/logs/"
+    cp "${srcdir}/default.sav" "${pkgdir}/opt/starship64/"
+    cp "${srcdir}/starship.cfg.json" "${pkgdir}/opt/starship64/"
+    
+    # Configure the permissions on the helper files
+    chmod 755 "${pkgdir}/opt/starship64/launcher.sh"
+    chmod 666 "${pkgdir}/opt/starship64/logs/Starship.log"
+    chmod 666 "${pkgdir}/opt/starship64/default.sav"
+    chmod 666 "${pkgdir}/opt/starship64/starship.cfg.json"
+
+    # Create the gnome application desktop entry
+    cp "${srcdir}/starship64.png" "${pkgdir}/usr/share/icons/"
+    cp "${srcdir}/starship64.desktop" "${pkgdir}/usr/share/applications/"
+}
