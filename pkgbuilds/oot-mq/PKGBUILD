@@ -1,0 +1,99 @@
+# Maintainer: Ephreal
+
+pkgname="oot-mq"
+pkgver="1.0.0"
+pkgrel="1"
+pkgdesc="Native Port of Legend of Zelda Ocarina of Time Master Quest"
+arch=('x86_64')
+url="https://github.com/HarbourMasters/shipwright"
+license=('MIT')
+source=(
+    'file://oot-mq.z64'
+    'file://imgui.ini'
+    'file://launcher.sh'
+    'file://shipofharkinian.json'
+    'file://oot-mq.desktop'
+    'file://oot-mq.png'
+    'https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/refs/heads/master/gamecontrollerdb.txt'
+)
+makedepends=('boost' 'clang' 'cmake' 'libpng' 'libzip' 'lsb-release' 'nlohmann-json' 'sdl2' 'sdl2_net' 'spdlog' 'tinyxml2' 'yaz')
+sha256sums=(
+    '9608d76d2ebe9eb99086cd9767efd5510c8d1bb2efc7518990a415972f07a671'
+    '5c421223ce0fbf848fa7ac08aba9d892d74de15d642313ff3602ae523d76c0c1'
+    'a260309e157c594480ee1b2598a5848e66b502431089f29a4ebbecaaa63aa617'
+    'e753b257432f99078e4d69783c48ecd3381af226629bc0ca49a7de0fce5b7bc7'
+    'c17baf069a6a9bd2e29110f76cd480084c5b79be8c88dc2aee58576930056926'
+    '74d4ed14e71fee0a0a30c6978492301054e5dc30d372544e6fbdbbcba7613ae4'
+    '934689558db37c13ebcc3c8240339a9b5d72e28161dca3a3577f28667e501dd7'
+)
+
+prepare() {
+    echo "Preparing package for build"
+    echo "Cloning git repo"
+    cd ${srcdir}
+    # Remove the oot-mq directory if it exists.
+    # This assumes this is a rebuild from scratch
+    if [ -d "${pkgname}" ]; then
+        rm -rf "${pkgname}"
+    fi
+    git clone $url $pkgname
+    cd ${pkgname}
+
+    echo "Cloning submodules"
+    git submodule update --init
+
+    # Copy the rom in
+    cp "${srcdir}/oot-mq.z64" "${srcdir}/${pkgname}/OTRExporter/oot-mq.z64"
+
+    echo "Beginning build"
+    # Generate Ninja project
+    # Add `-DCMAKE_BUILD_TYPE:STRING=Release` if you're packaging
+    # Add `-DPython3_EXECUTABLE=$(which python3)` if you are using non-standard Python installations such as PyEnv
+    # cmake -H. -Bbuild-cmake -GNinja -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+    # cmake -H. -Bbuild-cmake -GNinja -DCMAKE_BUILD_TYPE:STRING:Release
+    cmake -H. -Bbuild-cmake -GNinja
+
+    # Generate oot-mq.otr
+    cmake --build build-cmake --target ExtractAssets
+    # Compile the project
+    # Add `--config Release` if you're packaging
+    # cmake --build build-cmake --config Release
+    cmake --build build-cmake
+}
+
+package() {
+  src_repo="${srcdir}/${pkgname}"
+  dest_dir="${pkgdir}/opt/${pkgname}"
+  mkdir -p "${pkgdir}/opt/${pkgname}"
+  mkdir -p "${pkgdir}/opt/${pkgname}/logs"
+  mkdir -p "${dest_dir}/Save"
+  mkdir -p "${dest_dir}/mods"
+  mkdir -p "${pkgdir}/usr/share/icons"
+  mkdir -p "${pkgdir}/usr/share/applications"
+
+  # Copy over the base files to get this to work.
+  # This renames the soh.elf for clarity.
+  # It still looks for soh.otr, so that file itself will not be renamed.
+  cp "${srcdir}/${pkgname}/build-cmake/soh/soh.elf" "${pkgdir}/opt/${pkgname}/${pkgname}"
+  cp "${srcdir}/${pkgname}/build-cmake/soh/soh.otr" "${pkgdir}/opt/${pkgname}/"
+  cp "${src_repo}/OTRExporter/oot-mq.otr" "${dest_dir}/"
+  cp "${srcdir}/imgui.ini" "${dest_dir}/"
+
+  # Copy over some helper files
+  cp "${srcdir}/gamecontrollerdb.txt" "${dest_dir}/"
+  touch "${pkgdir}/opt/oot-mq/logs/Ship of Harkinian.log"
+  cp "${srcdir}/shipofharkinian.json" "${dest_dir}/"
+  cp "${srcdir}/launcher.sh" "${dest_dir}/"
+    
+  # Configure the permissions on the helper files
+  chmod 755 "${dest_dir}/launcher.sh"
+  chmod 666 "${dest_dir}/logs/Ship of Harkinian.log"
+  chmod 666 "${dest_dir}/imgui.ini"
+  chmod 777 "${dest_dir}/mods"
+  chmod 666 "${dest_dir}/shipofharkinian.json"
+  chmod 777 "${dest_dir}/Save"
+
+  # Create the gnome application desktop entry
+  cp "${srcdir}/${pkgname}.png" "${pkgdir}/usr/share/icons/"
+  cp "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications/"
+}

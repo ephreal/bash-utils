@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Ocarina of Time Master Quest
+StartupWMClass=Ocarina of Time Master Quest
+Comment=The Ocarina of Time Master Quest for the N54
+GenericName=Ocarina of Time Master Quest
+Exec=/opt/oot-mq/launcher.sh
+Icon=/usr/share/icons/oot-mq.png
+Type=Application
+Categories=Games;
+Path=/usr/bin
