@@ -6,7 +6,7 @@
 
 pkgname="starship64"
 pkgver="1.0.0"
-pkgrel="1"
+pkgrel="2"
 pkgdesc="Native Port of Starfox 64"
 arch=('x86_64')
 url="https://github.com/HarbourMasters/starship"
@@ -24,6 +24,7 @@ source=(
     'file://starship.cfg.json'
     'https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/refs/heads/master/gamecontrollerdb.txt'
 )
+depends=('tinyxml2')
 makedepends=('boost' 'clang' 'cmake' 'libpng' 'libzip' 'lsb-release' 'nlohmann-json' 'sdl2' 'sdl2_net' 'spdlog' 'tinyxml2')
 sha256sums=(
     '385bcf1901ed12fb1152f3c227d1968cc54ae41e8566da66695df71af40a573f'
