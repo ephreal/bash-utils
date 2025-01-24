@@ -2,7 +2,7 @@
 
 pkgname="oot-mq"
 pkgver="1.0.0"
-pkgrel="1"
+pkgrel="2"
 pkgdesc="Native Port of Legend of Zelda Ocarina of Time Master Quest"
 arch=('x86_64')
 url="https://github.com/HarbourMasters/shipwright"
@@ -16,6 +16,7 @@ source=(
     'file://oot-mq.png'
     'https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/refs/heads/master/gamecontrollerdb.txt'
 )
+depends=('tinyxml2')
 makedepends=('boost' 'clang' 'cmake' 'libpng' 'libzip' 'lsb-release' 'nlohmann-json' 'sdl2' 'sdl2_net' 'spdlog' 'tinyxml2' 'yaz')
 sha256sums=(
     '9608d76d2ebe9eb99086cd9767efd5510c8d1bb2efc7518990a415972f07a671'
