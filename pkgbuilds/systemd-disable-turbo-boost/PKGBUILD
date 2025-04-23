@@ -1,0 +1,20 @@
+#Maintainer: Ephreal <contact@mylifeneeds.management>
+
+pkgname="disable-turbo-boost"
+pkgver="1.0.0"
+pkgrel=1
+pkgdesc="A service to disable intel turbo boost on startup"
+arch=('x86_64')
+license=('MIT')
+install="${pkgname}.install"
+
+prepare() {
+    echo "Preparing Package"
+}
+
+package() {
+    echo "Start packaging"
+    mkdir -p "${pkgdir}/etc/systemd/system"
+    cp "${srcdir}/../${pkgname}.service" "${pkgdir}/etc/systemd/system/${pkgname}.service"
+}
+

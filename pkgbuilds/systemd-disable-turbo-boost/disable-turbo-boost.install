@@ -1,0 +1,9 @@
+post_install() {
+    echo "starting and enabling the disable-turbo-boost service"
+    systemctl start disable-turbo-boost.service
+    systemctl enable disable-turbo-boost.service
+}
+
+pre_remove() {
+    systemctl disable disable-turbo-boost.service
+}
