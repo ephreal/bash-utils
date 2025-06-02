@@ -1,12 +1,8 @@
 # Maintainer: Ephreal
-# Note: You must provide your own 'baserom.z64'.
-# It MUST match the sha256sum that the PKGBUILD has.
-# If it does not, this may or may not work.
-# Check https://github.com/HarbourMasters/starship for a list of valid files.
 
 pkgname="starship64"
-pkgver="1.0.0"
-pkgrel="2"
+pkgver="1.0.1"
+pkgrel="1"
 pkgdesc="Native Port of Starfox 64"
 arch=('x86_64')
 url="https://github.com/HarbourMasters/starship"
@@ -25,7 +21,7 @@ source=(
     'https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/refs/heads/master/gamecontrollerdb.txt'
 )
 depends=('tinyxml2')
-makedepends=('boost' 'clang' 'cmake' 'libpng' 'libzip' 'lsb-release' 'nlohmann-json' 'sdl2' 'sdl2_net' 'spdlog' 'tinyxml2')
+makedepends=('boost' 'clang' 'cmake' 'libpng' 'libzip' 'lsb-release' 'ninja' 'nlohmann-json' 'sdl2' 'sdl2_net' 'spdlog' 'tinyxml2')
 sha256sums=(
     '385bcf1901ed12fb1152f3c227d1968cc54ae41e8566da66695df71af40a573f'
     '9b5f1e416c7f087f37d3ad138f79e6c58f8a4f432272d1288c7360c592d04482'
@@ -39,6 +35,13 @@ sha256sums=(
 
 prepare() {
     echo "Preparing package for build"
+
+    # Remove the starship64 directory if it exists.
+    # This assumes this is a rebuild from scratch
+    if [ -d "${pkgname}" ]; then
+        rm -rf "${pkgname}"
+    fi
+
     echo "Cloning git repo"
     cd ${srcdir}
     git clone $url $pkgname
@@ -56,8 +59,11 @@ prepare() {
     # cmake -H. -Bbuild-cmake -GNinja -DCMAKE_BUILD_TYPE:STRING:Release
     cmake -H. -Bbuild-cmake -GNinja
 
-    # Generate sf64.otr
+    # Generate sf64.o2r
     cmake --build build-cmake --target ExtractAssets
+
+    # Generate starship.o2r
+    cmake --build build-cmake --target GeneratePortO2R
 
     # Compile the project
     # Add `--config Release` if you're packaging
@@ -70,9 +76,11 @@ package() {
     mkdir -p "${pkgdir}/opt/starship64/logs"
     mkdir -p "${pkgdir}/usr/share/icons"
     mkdir -p "${pkgdir}/usr/share/applications"
+    mkdir -p "${pkgdir}/opt/starship64/mods"
 
     cp "${srcdir}/${pkgname}/build-cmake/Starship" "${pkgdir}/opt/starship64/${pkgname}"
-    cp "${srcdir}/${pkgname}/build-cmake/sf64.otr" "${pkgdir}/opt/starship64/"
+    cp "${srcdir}/${pkgname}/build-cmake/starship.o2r" "${pkgdir}/opt/starship64/starship.o2r"
+    cp "${srcdir}/${pkgname}/build-cmake/sf64.o2r" "${pkgdir}/opt/starship64/"
     cp "${srcdir}/gamecontrollerdb.txt" "${pkgdir}/opt/starship64/"
 
     # Copy in helper files that are used to provide saves, controller config, etc
@@ -86,6 +94,7 @@ package() {
     chmod 666 "${pkgdir}/opt/starship64/logs/Starship.log"
     chmod 666 "${pkgdir}/opt/starship64/default.sav"
     chmod 666 "${pkgdir}/opt/starship64/starship.cfg.json"
+    chmod 777 "${pkgdir}/opt/starship64/mods"
 
     # Create the gnome application desktop entry
     cp "${srcdir}/starship64.png" "${pkgdir}/usr/share/icons/"
