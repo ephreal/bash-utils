@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=Majoras Mask
+StartupWMClass=Majoras Mask
+Comment=Legend of Zelda Majoras Mask for N64
+GenericName=Majoras Mask
+Exec=/opt/majoras-mask/launcher.sh
+Icon=/usr/share/icons/majoras-mask.png
+Type=Application
+Categories=Game;
+Path=/usr/bin
+

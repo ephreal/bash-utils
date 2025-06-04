@@ -1,0 +1,107 @@
+# Maintainer: Ephreal
+
+pkgname="majoras-mask"
+pkgver="1.0.0"
+pkgrel="2"
+pkgdesc="Native Port of Legend of Zelda Majoras Mask"
+arch=('x86_64')
+url="https://github.com/HarbourMasters/2ship2harkinian"
+license=('MIT')
+source=(
+    'file://mm.z64'
+    'file://imgui.ini'
+    'file://launcher.sh'
+    'file://2ship2harkinian.json'
+    'file://majoras-mask.desktop'
+    'file://majoras-mask.png'
+    'https://raw.githubusercontent.com/mdqinc/SDL_GameControllerDB/refs/heads/master/gamecontrollerdb.txt'
+)
+makedepends=('boost' 'clang' 'cmake' 'libpng' 'libzip' 'lsb-release' 'nlohmann-json' 'opus-tools' 'sdl2' 'sdl2_net' 'spdlog' 'tinyxml2')
+sha256sums=(
+    'efb1365b3ae362604514c0f9a1a2d11f5dc8688ba5be660a37debf5e3be43f2b'
+    'af9bcaeeddd453920561553d354acbcea168b218829bed63ed442ebf32e5110b'
+    '4083ae7496bbe40e57f87bf380324f2e204f9818521ebf2baaf64d0f18e44cf3'
+    'eb0718c3e374b06c8551ba3e7f5e7bda684afc75e0fc21963788fba0bf823937'
+    'c6ee0bee914b3adbd6cad30848422182ef1f47c159595253fe96fbf75e788e6a'
+    '5c427abd3be35bfc5b4808c826544935ead364c019f5ee17af467d5207de37ca'
+    '42206312ad2f622de554987f9eb58e0f6e616638ecae35d827d27f8cd9b01504'
+)
+
+prepare() {
+    echo "Preparing package for build"
+    echo "Cloning git repo"
+    cd ${srcdir}
+    # Remove the majorasmask directory if it exists.
+    # This assumes this is a rebuild from scratch
+    if [ -d "${pkgname}" ]; then
+        rm -rf "${pkgname}"
+    fi
+    git clone $url $pkgname
+    cd ${pkgname}
+
+    echo "Cloning submodules"
+    git submodule update --init
+
+    # Copy the rom in
+    cp "${srcdir}/mm.z64" "${srcdir}/${pkgname}/OTRExporter/mm.z64"
+
+    echo "Beginning build"
+    # Generate Ninja project
+    # Add `-DCMAKE_BUILD_TYPE:STRING=Release` if you're packaging
+    # Add `-DPython3_EXECUTABLE=$(which python3)` if you are using non-standard Python installations such as PyEnv
+    # cmake -H. -Bbuild-cmake -GNinja -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+    # cmake -H. -Bbuild-cmake -GNinja -DCMAKE_BUILD_TYPE:STRING:Release
+    cmake -H. -Bbuild-cmake -GNinja
+
+    # Generate mm.o2r
+    cmake --build build-cmake --target ExtractAssets
+
+    # Generate 2ship.o2r
+    cmake --build build-cmake --target Generate2ShipOtr
+
+    # Compile the project
+    # Add `--config Release` if you're packaging
+    # cmake --build build-cmake --config Release
+    cmake --build build-cmake
+}
+
+package() {
+  src_repo="${srcdir}/${pkgname}"
+  mm_dir="${pkgdir}/opt/${pkgname}"
+  mkdir -p "${mm_dir}"
+  mkdir -p "${mm_dir}/logs"
+  mkdir -p "${mm_dir}/saves"
+  mkdir -p "${mm_dir}/mods"
+  mkdir -p "${mm_dir}/presets"
+  mkdir -p "${mm_dir}/randomizer"
+  mkdir -p "${pkgdir}/usr/share/icons"
+  mkdir -p "${pkgdir}/usr/share/applications"
+
+  # Copy over the base files to get this to work.
+  # This renames the 2ship.elf for clarity.
+  # It still looks for 2ship.o2r, so that file itself will not be renamed.
+  cp "${srcdir}/${pkgname}/build-cmake/mm/2s2h.elf" "${mm_dir}/${pkgname}"
+  cp "${srcdir}/${pkgname}/build-cmake/mm/2ship.o2r" "${mm_dir}/"
+  cp "${srcdir}/${pkgname}/build-cmake/mm/mm.o2r" "${mm_dir}/"
+  cp "${srcdir}/imgui.ini" "${mm_dir}/"
+
+  # Copy over some helper files
+  cp "${srcdir}/gamecontrollerdb.txt" "${mm_dir}/"
+  touch "${mm_dir}/logs/2 Ship 2 Harkinian.log"
+  cp "${srcdir}/2ship2harkinian.json" "${mm_dir}/"
+  cp "${srcdir}/launcher.sh" "${mm_dir}/"
+    
+  # Configure the permissions on the helper files
+  chmod 755 "${mm_dir}/launcher.sh"
+  chmod 666 "${mm_dir}/logs/2 Ship 2 Harkinian.log"
+  chmod 666 "${mm_dir}/imgui.ini"
+  chmod 777 "${mm_dir}/mods"
+  chmod 666 "${mm_dir}/2ship2harkinian.json"
+  chmod 777 "${mm_dir}/saves"
+  chmod 777 "${mm_dir}/presets"
+  chmod 777 "${mm_dir}/randomizer"
+
+  # Create the gnome application desktop entry
+  cp "${srcdir}/${pkgname}.png" "${pkgdir}/usr/share/icons/"
+  cp "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications/"
+}
