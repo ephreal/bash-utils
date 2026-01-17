@@ -1,0 +1,23 @@
+# Maintainer: Ephreal
+
+pkgname="hytale-downloader"
+_pkgname="Hytale Downloader"
+pkgver="1.0.0"
+pkgrel=1
+pkgdesc="The official Hytale server/client downloader"
+arch=("x86_64")
+url="https://downloader.hytale.com/hytale-downloader.zip"
+license=('UNKNOWN')
+makedepends=('wget')
+source=("$url")
+sha256sums=('9878d5bd17a4654355d168f29c1434443298fdb9256e2f6ad736de9887c8d4bf')
+
+prepare() {
+    wget $url
+    unzip -o -e $pkgname
+}
+
+package() {
+    mkdir -p "$pkgdir/usr/bin"
+    cp "${pkgname}-linux-amd64" "${pkgdir}/usr/bin/${pkgname}"
+}
