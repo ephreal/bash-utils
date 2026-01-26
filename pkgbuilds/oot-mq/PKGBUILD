@@ -2,7 +2,7 @@
 
 pkgname="oot-mq"
 pkgver="1.0.0"
-pkgrel="3"
+pkgrel="4"
 pkgdesc="Native Port of Legend of Zelda Ocarina of Time Master Quest"
 arch=('x86_64')
 url="https://github.com/HarbourMasters/shipwright"

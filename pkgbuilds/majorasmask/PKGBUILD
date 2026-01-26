@@ -2,7 +2,7 @@
 
 pkgname="majoras-mask"
 pkgver="1.0.0"
-pkgrel="2"
+pkgrel="3"
 pkgdesc="Native Port of Legend of Zelda Majoras Mask"
 arch=('x86_64')
 url="https://github.com/HarbourMasters/2ship2harkinian"
