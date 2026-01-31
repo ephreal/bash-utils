@@ -4,13 +4,13 @@ pkgname="autopkg-agent"
 pkgver="0.3.1"
 pkgrel=2
 pkgdesc="Automatically build and store packages for archlinux"
-arch=("x86_64" "armv7h")
+arch=("x86_64" "armv7h" "aarch64")
 url="https://gitlab.needs.management/ephreal/autopkg-agent"
 install="$pkgname.install"
 license=('MIT')
 makedepends=('rust')
 source=("${url}/-/archive/${pkgver}/${pkgname}-${pkgver}.zip")
-sha256sums=('a96c3137ac666fea92760ae360a653222d9d3ec8627369656a42527af409761d')
+sha256sums=('8c8d400a24c57a2afb324a6f399517095dd42f94839e3cf06d450abf2bf3f0df')
 
 backup=(
     "etc/autopkg/autopkg-agent.json"
