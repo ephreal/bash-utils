@@ -2,9 +2,10 @@
 
 pkgname="uct-display"
 pkgver="1.0.0"
-pkgrel=2
+pkgrel=3
 pkgdesc="Allows the UCTronics Rackmount RPI display to function"
 arch=('armv7h' "aarch64")
+depends=('i2c-tools' 'lm_sensors')
 url="https://github.com/UCTRONICS/U6143_ssd1306"
 license=('unknown')
 
