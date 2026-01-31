@@ -1,2 +1,6 @@
+# These show up when you run the archlinux rpi installer
 ArchLinuxARM-rpi-armv7-latest.tar.gz
+ArchLinuxARM-rpi-aarch64-latest.tar.gz
+
+# Can appear when running some of the build scripts
 scripts/packages/*

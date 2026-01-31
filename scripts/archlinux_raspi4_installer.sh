@@ -1,13 +1,32 @@
 # Leave just ONE of these uncommented to choose your raspi archlinux version
-arch_ver=ArchLinuxARM-rpi-armv7-latest.tar.gz
+# Note: armv7h doesn't work wiith raspi4 on the latest version of linux.
+# No bueno.
+# ARCH_VER=ArchLinuxARM-rpi-armv7-latest.tar.gz
 
 # Archlinux for Raspi 4+ and Raspi 5
-# arch_ver=ArchLinuxARM-rpi-aarch64-latest.tar.gz
+ARCH_VER=ArchLinuxARM-rpi-aarch64-latest.tar.gz
 
 # Packages that I need installed after the base install completes
 # These are not installed automatically *yet*. They will be
 # eventually.
-required_packages="salt sudo vim wget"
+required_packages="dosfstools sudo vim wget"
+
+download_packages() {
+    needed=()
+    required_packages=("dosfstools" "sudo" "vim" "wget")
+
+    for package in "${required_packages[@]}"; do
+        if ! pacman -Qi "${package}" &>/dev/null; then 
+            needed+=("$package")
+        fi
+    done
+
+    if [ "${#needed[@]}" -gt 0 ]; then
+        sudo pacman -Syu "${needed[@]}"
+    fi
+}
+
+download_packages
 
 # Decides what block devices the script will search for as valid installabl
 # devices
@@ -70,6 +89,7 @@ echo "Enter the hostname for this device: "
 read name
 
 # This part looks a little weird because fdisk accepts input directly from the stdin
+# The regex simply lets this strip out the comments while still running the command
 sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | sudo fdisk /dev/$device
     o # New Partition Table
     n # New partition
@@ -87,7 +107,7 @@ sed -e 's/\s*\([\+0-9a-zA-Z]*\).*/\1/' << EOF | sudo fdisk /dev/$device
     w # Write the changes
 EOF
 
-# Create boot partition
+# Get boot partition
 if [ $dev_selection == "sd-card" ]
 then
     boot="/dev/$(echo $device)p1"
@@ -96,36 +116,39 @@ else
     boot="/dev/${device}1"
 fi
 
-# Ensure boot is unmounted. Some desktop environments automatically mount partitions
-sudo umount $boot
-echo $boot
-sudo mkfs.vfat $boot
-mkdir boot
-sudo mount $boot boot
-
-# Create root partition
+# Get Root Partition
 if [ $dev_selection == "sd-card" ]
 then
-    root="/dev/$(echo $device)p2" 
+    root="/dev/$(echo $device)p2"
 else
     root="/dev/$(echo $device)2"
 fi
 
+# Ensure boot and root are unmounted. Some desktop environments automatically mount partitions.
+sudo umount $boot
 sudo umount $root
+
+# Format root and boot partitions.
+echo "Writing VFAT to ${boot}"
+sudo mkfs.vfat $boot
+mkdir boot
+sudo mount $boot boot
+
+echo "Writing ext4 to to ${root}"
 sudo mkfs.ext4 $root
 mkdir root
 sudo mount $root root
 
-if [ ! -f $arch_ver ]; then
-    wget http://os.archlinuxarm.org/os/$arch_ver
+if [ ! -f $ARCH_VER ]; then
+    wget http://os.archlinuxarm.org/os/$ARCH_VER
 fi
 
-sudo bsdtar -xpf $arch_ver -C root
+sudo bsdtar -xpf $ARCH_VER -C root
 sudo sync
 
 sudo sed -i "s/alarmpi/$name/g" root/etc/hostname
 
-sudo mv root/boot/* boot/
+sudo mv -f root/boot/* boot/
 sudo umount boot root
 
 echo "The SD card should now be ready to use. Insert it into the raspberry pi and log in."
