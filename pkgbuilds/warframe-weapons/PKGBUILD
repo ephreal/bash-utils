@@ -1,20 +1,21 @@
 # Maintainer: Ephreal
 
 pkgname="warframe-weapons"
-pkgver="1.0.4"
-pkgrel=3
+_download_name="warframe-weapons-linux-x86_64"
+pkgver="1.0.6"
+pkgrel=1
 pkgdesc="A Warframe Lich/Sister of Parvos weapon tracker"
 arch=("x86_64")
 url="https://github.com/ephreal/warframe-weapons"
 license=('MIT')
 makedepends=('wget')
 source=(
-        "${url}/releases/download/${pkgver}/warframe-weapons"
+        "${url}/releases/download/${pkgver}/${_download_name}"
         "https://raw.githubusercontent.com/ephreal/warframe-weapons/main/packaging/pkgbuild/warframe-weapons.desktop"
         "https://raw.githubusercontent.com/ephreal/warframe-weapons/main/packaging/pkgbuild/warframe-weapons.png"
 )
 sha256sums=(
-            '1c2873ae079be54cc1f0ebf31adcfef80a5a9b8da42b444438bce132a7e8efd6'
+            '14eb8b54eb015e7def8937ac992dc6b9d34cd84b4bfc9cacc7aea0e89b34a02d'
             '9de2d85697449ae29512af3c3ab5b3b3d7f4f47bbe7ddfc6324e9b90517e482c'
             '6d164a0e527da24e6e82f3ea7057cb27c958fa818977a551e5f2016a8d5ed44c'
 )
@@ -22,7 +23,7 @@ sha256sums=(
 package() {
     # Executable Placement
     mkdir -p "${pkgdir}/usr/bin"
-    cp "./${pkgname}" "${pkgdir}/usr/bin/${pkgname}"
+    cp "./${_download_name}" "${pkgdir}/usr/bin/${pkgname}"
     chmod +x "${pkgdir}/usr/bin/${pkgname}"
 
     # Desktop Item Setup
