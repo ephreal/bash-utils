@@ -3,7 +3,7 @@ Description=UCTronics LCD display service
 After=syslog.target
 
 [Service]
-ExecStart=/usr/bin/uct-display
+ExecStart=/usr/bin/uct-display -i end0 -t c -d /dev/i2c-1
 Restart=always
 
 [Install]
