@@ -6,7 +6,73 @@
 
 # Archlinux for Raspi 4+ and Raspi 5
 ARCH_VER="ArchLinuxARM-rpi-aarch64-latest.tar.gz"
+SETUP_SCRIPT=""
+NOCONFIRM=false
+REMOVE_ALARM=false
+PUBKEY=""
 
+DEVICES=()
+DEVICE_TYPE=""
+SELECTED_DEVICE=""
+BOOT_PARTITION=""
+ROOT_PARTITION=""
+
+###############################################################################
+# Input Handling and CLI Parsing
+###############################################################################
+usage() {
+    echo ""
+    echo "Usage: $0 [-s|--setup-script FILE] [-d|--device DEVICE] [-t|--device_type <block|sd-card>] [-s|--setup-script PATH] [-k|--public-key PATH] [--remove-alarm] [--no-confirm]" >&2
+
+    echo "$0 arguments
+    -h|--help                   Print this help text
+    -d|--device       [DEVICE]  The device to install archlinuxarm on
+    -t|--device-type  [sd-card | block] The device type specified by --device
+    -s|--setup-script [FILE]    Script to run on first boot after installation
+    -k|--public-key   [FILE]    SSH Key to install for root
+    --remove-alarm              Remove the default alarm user from the install
+    --no-confirm                Assume yes to any questions in this script
+    "
+    exit 1
+}
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -s|--setup-script) [[ -n $2 ]] || usage; SETUP_SCRIPT=$2; shift 2 ;;
+        -d|--device)       [[ -n $2 ]] || usage; SELECTED_DEVICE=$2; shift 2 ;;
+        -t|--device-type)  [[ -n $2 ]] || usage; DEVICE_TYPE=$2; shift 2 ;;
+        -k|--public-key)   [[ -n $2 ]] || usage; PUBKEY=$2; shift 2 ;;
+        -r|--remove-alarm) REMOVE_ALARM=true; shift ;;
+        --no-confirm)      NOCONFIRM=true; shift ;;
+        -h|--help)         usage ;;
+        *) echo "Unknown argument: $1" >&2; usage ;;
+    esac
+done
+
+# Validate the flags needed for running the script
+# Device given with -d but no type: partition naming needs it
+if [[ -n $SELECTED_DEVICE && -z $DEVICE_TYPE ]]; then
+    echo "A device type (-t sd-card|block) is required when using -d." >&2
+    exit 1
+fi
+
+if [[ -n $DEVICE_TYPE && $DEVICE_TYPE != "sd-card" && $DEVICE_TYPE != "block" ]]; then
+    echo "Invalid device type: ${DEVICE_TYPE} (use sd-card or block)" >&2
+    exit 1
+fi
+
+# Alarm removed with no SSH key: warn, and pause unless --no-confirm
+if $REMOVE_ALARM && [[ -z $PUBKEY ]]; then
+    echo "WARNING: --remove-alarm without --public-key leaves no SSH login." >&2
+    if ! $NOCONFIRM; then
+        read -rp "Continue anyway? y/n " answer
+        [[ $answer == "y" ]] || { echo "Exiting..."; exit 1; }
+    fi
+fi
+
+###############################################################################
+# Function Declarations
+###############################################################################
 download_packages() {
     needed=()
     required_packages=("dosfstools" "sudo" "wget")
@@ -19,7 +85,7 @@ download_packages() {
 
     if [ "${#needed[@]}" -gt 0 ]; then
         echo "Required packages are missing. Installing..."
-        sudo pacman -Syu "${needed[@]}"
+        sudo pacman -Syu --noconfirm "${needed[@]}"
     fi
 }
 
@@ -209,30 +275,27 @@ format_partitions() {
     local root=$2
 
     # Ensure boot and root are unmounted. Some desktop environments automatically mount partitions.
-    sudo umount $boot
-    sudo umount $root
+    sudo umount "${boot}"
+    sudo umount "${root}"
 
     # Format root and boot partitions.
     echo "Writing VFAT to ${boot}"
-    sudo mkfs.vfat $boot
+    sudo mkfs.vfat "${boot}"
     mkdir boot
-    sudo mount $boot boot
+    sudo mount "${boot}" boot
 
     echo "Writing ext4 to to ${root}"
-    sudo mkfs.ext4 $root
+    if $NOCONFIRM; then
+        sudo mkfs.ext4 -F "${root}"
+    else
+        sudo mkfs.ext4 "${root}"
+    fi
     mkdir root
-    sudo mount $root root
+    sudo mount "${root}" root
 
 }
 
 install_archlinux() {
-    [[ -n $1 ]] || {
-        echo "hostname must be passed to install_archlinux"
-        exit 1
-    }
-
-    local hname=$1
-
     if [ ! -f $ARCH_VER ]; then
         wget http://os.archlinuxarm.org/os/$ARCH_VER
     fi
@@ -241,12 +304,7 @@ install_archlinux() {
     sudo bsdtar -xpf $ARCH_VER -C "root"
     sudo sync
 
-    # sudo echo "${hname}" > root/etc/hostname
-    # Echo the value to a process running as root since this requires root permissions
-    echo "${hname}" | sudo tee root/etc/hostname >/dev/null
-
     sudo mv -f root/boot/* boot/
-
 
     # Note: This *MAY* need to happen on block devices as well, but I've
     # never had the opportunity to test that.
@@ -254,6 +312,93 @@ install_archlinux() {
     if [ $ARCH_VER == "ArchLinuxARM-rpi-aarch64-latest.tar.gz" ]; then
         sudo sed -i 's/mmcblk0/mmcblk1/g' 'root/etc/fstab'
     fi
+}
+
+install_setup_script() {
+    [[ -n $1 ]] || {
+        echo "No setup script passed to install_setup_script"
+        exit 1
+    }
+
+    local script=$1
+
+    sudo install -D -m 0700 -o root -g root "${script}" "root/usr/local/sbin/firstboot-setup.sh"
+    sudo chmod +x "root/usr/local/sbin/firstboot-setup.sh"
+
+    sudo tee root/etc/systemd/system/firstboot-setup.service >/dev/null <<'EOF' || exit 1
+[Unit]
+Description=First-boot setup
+Wants=network-online.target
+After=network-online.target time-sync.target
+ConditionPathExists=/usr/local/sbin/firstboot-setup.sh
+
+[Service]
+Type=oneshot
+TimeoutStartSec=0
+StandardOutput=append:/var/log/firstboot-setup.log
+StandardError=inherit
+ExecStartPre=/usr/bin/pacman-key --init
+ExecStartPre=/usr/bin/pacman-key --populate archlinuxarm
+ExecStart=/usr/local/sbin/firstboot-setup.sh
+ExecStartPost=-/usr/bin/gpgconf --homedir /etc/pacman.d/gnupg --kill all
+ExecStartPost=/usr/bin/rm -f /usr/local/sbin/firstboot-setup.sh
+ExecStartPost=/usr/bin/systemctl disable firstboot-setup.service
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    # Enable the unit by creating the symlink systemctl enable would make.
+    # The target is absolute as seen from *inside* the image.
+    sudo mkdir -p root/etc/systemd/system/multi-user.target.wants
+    sudo ln -sf /etc/systemd/system/firstboot-setup.service \
+        root/etc/systemd/system/multi-user.target.wants/firstboot-setup.service
+}
+
+validate_pubkey() {
+    [[ -f $PUBKEY && -r $PUBKEY ]] || {
+        echo "Public key not found or unreadable: ${PUBKEY}" >&2
+        exit 1
+    }
+
+    # Prevent passing a private key
+    if grep -q 'PRIVATE KEY' "${PUBKEY}"; then
+        echo "That looks like a PRIVATE key. Pass the .pub file." >&2
+        exit 1
+    fi
+}
+
+install_pubkey() {
+    [[ -n $1 ]] || {
+        echo "install_pubkey receive no pubkey path"
+        exit 1
+    }
+
+    local pubkey=$1
+    local key_path="root/root/.ssh"
+
+    # Create the .ssh path for root
+    sudo mkdir -p "${key_path}"
+    sudo chown root:root "${key_path}"
+    sudo chmod 700 "${key_path}"
+
+    # Install the key into the authorized_keys
+    sudo install -D -m 0600 -o root -g root "${pubkey}" "${key_path}/authorized_keys"
+    local ssh_policy="# Written by raspi installer: key-only SSH for default accounts.
+Match User root,alarm
+    PermitRootLogin prohibit-password
+    PasswordAuthentication no
+    KbdInteractiveAuthentication no
+"
+
+    printf '\n%s' "${ssh_policy}" | sudo tee -a root/etc/ssh/sshd_config > /dev/null
+}
+
+remove_alarm_user() {
+    sudo sed -i '/^alarm:/d' root/etc/passwd root/etc/shadow root/etc/group root/etc/gshadow
+    # Strip alarm from supplementary group member lists (wheel, etc.)
+    sudo sed -i -E -e 's/:alarm$/:/' -e 's/:alarm,/:/' -e 's/,alarm(,|$)/\1/' root/etc/group root/etc/gshadow
+    sudo rm -rf root/home/alarm || exit 1
 }
 
 cleanup() {
@@ -273,12 +418,15 @@ cleanup() {
     sudo umount boot root
 
     echo "The SD card should now be ready to use. Insert it into the raspberry pi and log in."
-    echo "The default username and password are"
+    echo "The default usernames and passwords are"
     echo "Username: alarm"
     echo "Password: alarm"
     echo
     echo "root pass: root"
     echo
+    echo "This may be different if you have asked the script to remove alarm or"
+    echo "set an ssh key for the root login".
+    echo ""
     echo "Once you have logged in, be sure to init/populate the archlinux keyring"
     echo "pacman-key --init && pacman-key --populate archlinuxarm"
 
@@ -288,34 +436,59 @@ cleanup() {
 
 }
 
-DEVICES=()
-DEVICE_TYPE=""
-SELECTED_DEVICE=""
-BOOT_PARTITION=""
-ROOT_PARTITION=""
 
-download_packages
-get_devices DEVICES DEVICE_TYPE
-select_device SELECTED_DEVICE DEVICES
 
-echo "Using ${SELECTED_DEVICE}"
-echo "Is this correct? y/n"
-read -r confirmation
-
-if [ "$confirmation" != "y" ]; then
-    echo "Exiting..."
-    exit 1
+###############################################################################
+# Install Process
+##############################################################################
+if [[ -n $PUBKEY ]]; then
+    validate_pubkey
 fi
 
-while [[ -z $NEW_HOSTNAME ]]; do
-    echo "What is the hostname of this device?"
-    read -r NEW_HOSTNAME
-done
+if [[ -n $SETUP_SCRIPT ]]; then
+     [[ -f $SETUP_SCRIPT && -r $SETUP_SCRIPT ]] || {
+        echo "Setup script not found or unreadable: ${SETUP_SCRIPT}" >&2
+        exit 1
+    }
+fi
+
+download_packages
+
+if [[ -z $SELECTED_DEVICE ]]; then
+    get_devices DEVICES DEVICE_TYPE
+    select_device SELECTED_DEVICE DEVICES
+fi
+
+echo "Using ${SELECTED_DEVICE}"
+
+if ! $NOCONFIRM; then
+    echo "Is this correct? y/n"
+    read -r confirmation
+
+    if [ "$confirmation" != "y" ]; then
+        echo "Exiting..."
+        exit 1
+    fi
+fi
 
 format_device $SELECTED_DEVICE
 get_boot_and_root_partition $SELECTED_DEVICE BOOT_PARTITION ROOT_PARTITION $DEVICE_TYPE
 
 format_partitions $BOOT_PARTITION $ROOT_PARTITION
-install_archlinux "${NEW_HOSTNAME}"
+install_archlinux
+
+# Install the setup script if a script was specified
+if [[ -n $SETUP_SCRIPT ]]; then
+    install_setup_script "${SETUP_SCRIPT}"
+fi
+
+if [[ -n $PUBKEY ]]; then
+    install_pubkey "${PUBKEY}"
+fi
+
+if $REMOVE_ALARM; then
+    remove_alarm_user
+fi
+
 cleanup $BOOT_PARTITION $ROOT_PARTITION
 exit 0
