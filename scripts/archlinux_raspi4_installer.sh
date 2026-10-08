@@ -319,7 +319,7 @@ install_archlinux() {
     if [ $ARCH_VER == "ArchLinuxARM-rpi-aarch64-latest.tar.gz" ]; then
         partuuid=$(sudo blkid -s PTUUID -o value "${device}")
         [[ -n $partuuid ]] || { echo "Could not read partition uuid for ${device}" >&2; exit1; }
-        sudo sed -i 's?/dev/mmcblk0p1?PARTUUID=${partuuid}-01?g' 'root/etc/fstab'
+        sudo sed -i "s?/dev/mmcblk0p1?PARTUUID=${partuuid}-01?g" root/etc/fstab
     fi
 }
 
