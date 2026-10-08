@@ -325,7 +325,7 @@ install_setup_script() {
     sudo install -D -m 0700 -o root -g root "${script}" "root/usr/local/sbin/firstboot-setup.sh"
     sudo chmod +x "root/usr/local/sbin/firstboot-setup.sh"
 
-    sudo tee root/etc/systemd/system/firstboot-setup.service >/dev/null <<'EOF' || exit 1
+    sudo tee root/etc/systemd/system/firstboot-setup.service >/dev/null <<'EOF'
 [Unit]
 Description=First-boot setup
 Wants=network-online.target
@@ -343,6 +343,7 @@ ExecStart=/usr/local/sbin/firstboot-setup.sh
 ExecStartPost=-/usr/bin/gpgconf --homedir /etc/pacman.d/gnupg --kill all
 ExecStartPost=/usr/bin/rm -f /usr/local/sbin/firstboot-setup.sh
 ExecStartPost=/usr/bin/systemctl disable firstboot-setup.service
+ExecStartPost=/usr/bin/systemctl reboot
 
 [Install]
 WantedBy=multi-user.target
@@ -415,25 +416,30 @@ cleanup() {
     local boot=$1
     local root=$2
 
+    # Unmount the boot and root partitions, then clean up the directories.
     sudo umount boot root
-
-    echo "The SD card should now be ready to use. Insert it into the raspberry pi and log in."
-    echo "The default usernames and passwords are"
-    echo "Username: alarm"
-    echo "Password: alarm"
-    echo
-    echo "root pass: root"
-    echo
-    echo "This may be different if you have asked the script to remove alarm or"
-    echo "set an ssh key for the root login".
-    echo ""
-    echo "Once you have logged in, be sure to init/populate the archlinux keyring"
-    echo "pacman-key --init && pacman-key --populate archlinuxarm"
-
-
     sudo rm -rf boot
     sudo rm -rf root
 
+    # Inform the user what to do when they first get the pi up and running.
+    echo "The SD card should now be ready to use. Insert it into the raspberry pi and log in."
+    echo "The default usernames and passwords are"
+    if ! $REMOVE_ALARM; then
+        echo "Username: alarm"
+        echo "Password: alarm"
+        echo
+    fi
+    echo "root pass: root"
+    if [[ -n $PUBKEY ]]; then
+        echo "SSH Login via password has been disabled for the root and alarm users."
+        echo "Ensure you are logging into root via SSH from a device with the correct private key."
+    fi
+
+    if [[ -z $SETUP_SCRIPT ]]; then
+        echo ""
+        echo "Once you have logged in, be sure to init/populate the archlinux keyring"
+        echo "pacman-key --init && pacman-key --populate archlinuxarm"
+    fi
 }
 
 
