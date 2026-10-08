@@ -296,6 +296,13 @@ format_partitions() {
 }
 
 install_archlinux() {
+    [[ -n $1 ]] || {
+        echo "The device must be passed into install_archlinux"
+        exit 1
+    }
+
+    local device=$1
+
     if [ ! -f $ARCH_VER ]; then
         wget http://os.archlinuxarm.org/os/$ARCH_VER
     fi
@@ -310,7 +317,9 @@ install_archlinux() {
     # never had the opportunity to test that.
     # I'm only targeting the SD cards until I know it has to happen.
     if [ $ARCH_VER == "ArchLinuxARM-rpi-aarch64-latest.tar.gz" ]; then
-        sudo sed -i 's/mmcblk0/mmcblk1/g' 'root/etc/fstab'
+        partuuid=$(sudo blkid -s PTUUID -o value "${device}")
+        [[ -n $partuuid ]] || { echo "Could not read partition uuid for ${device}" >&2; exit1; }
+        sudo sed -i 's?/dev/mmcblk0p1?PARTUUID=${partuuid}-01?g' 'root/etc/fstab'
     fi
 }
 
@@ -481,7 +490,7 @@ format_device $SELECTED_DEVICE
 get_boot_and_root_partition $SELECTED_DEVICE BOOT_PARTITION ROOT_PARTITION $DEVICE_TYPE
 
 format_partitions $BOOT_PARTITION $ROOT_PARTITION
-install_archlinux
+install_archlinux $SELECTED_DEVICE
 
 # Install the setup script if a script was specified
 if [[ -n $SETUP_SCRIPT ]]; then
