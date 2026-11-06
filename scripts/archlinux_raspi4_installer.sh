@@ -17,22 +17,33 @@ SELECTED_DEVICE=""
 BOOT_PARTITION=""
 ROOT_PARTITION=""
 
+FILES=()
+
 ###############################################################################
 # Input Handling and CLI Parsing
 ###############################################################################
 usage() {
-    echo ""
-    echo "Usage: $0 [-s|--setup-script FILE] [-d|--device DEVICE] [-t|--device_type <block|sd-card>] [-s|--setup-script PATH] [-k|--public-key PATH] [--remove-alarm] [--no-confirm]" >&2
+    cat >&2 <<EOF
+Usage: $0 [OPTIONS]
 
-    echo "$0 arguments
-    -h|--help                   Print this help text
-    -d|--device       [DEVICE]  The device to install archlinuxarm on
-    -t|--device-type  [sd-card | block] The device type specified by --device
-    -s|--setup-script [FILE]    Script to run on first boot after installation
-    -k|--public-key   [FILE]    SSH Key to install for root
-    --remove-alarm              Remove the default alarm user from the install
-    --no-confirm                Assume yes to any questions in this script
-    "
+Install Arch Linux ARM on an SD card or block device for a Raspberry Pi.
+
+Options:
+  -d, --device DEVICE           Device to install to (e.g. /dev/mmcblk0)
+  -t, --device-type TYPE        Type of DEVICE: sd-card or block
+                                (required with --device)
+  -s, --setup-script FILE       Script to run on first boot
+  -k, --public-key FILE         SSH public key to install for root
+  -f, --file SOURCE DEST        Copy SOURCE (on this machine) to DEST (absolute
+                                path on the Pi). May be given multiple times.
+  -r, --remove-alarm            Remove the default 'alarm' user
+      --no-confirm              Assume yes to all prompts
+  -h, --help                    Show this help
+
+Examples:
+  $0 -d /dev/mmcblk0 -t sd-card -k ~/.ssh/id_ed25519.pub
+  $0 -d /dev/sdb -t block -f ./motd /etc/motd -f ./hosts.extra /etc/hosts.extra
+EOF
     exit 1
 }
 
@@ -42,6 +53,7 @@ while [[ $# -gt 0 ]]; do
         -d|--device)       [[ -n $2 ]] || usage; SELECTED_DEVICE=$2; shift 2 ;;
         -t|--device-type)  [[ -n $2 ]] || usage; DEVICE_TYPE=$2; shift 2 ;;
         -k|--public-key)   [[ -n $2 ]] || usage; PUBKEY=$2; shift 2 ;;
+        -f|--file)         [[ -n ${2:-} && -n ${3:-} ]] || usage; FILES+=("${2}" "${3}"); shift 3 ;;
         -r|--remove-alarm) REMOVE_ALARM=true; shift ;;
         --no-confirm)      NOCONFIRM=true; shift ;;
         -h|--help)         usage ;;
@@ -349,7 +361,7 @@ StandardError=inherit
 ExecStartPre=/usr/bin/pacman-key --init
 ExecStartPre=/usr/bin/pacman-key --populate archlinuxarm
 ExecStart=/usr/local/sbin/firstboot-setup.sh
-ExecStartPost=-/usr/bin/gpgconf --homedir /etc/pacman.d/gnupg --kill all
+# ExecStartPost=-/usr/bin/gpgconf --homedir /etc/pacman.d/gnupg --kill all
 ExecStartPost=/usr/bin/rm -f /usr/local/sbin/firstboot-setup.sh
 ExecStartPost=/usr/bin/systemctl disable firstboot-setup.service
 ExecStartPost=/usr/bin/systemctl reboot
@@ -451,13 +463,45 @@ cleanup() {
     fi
 }
 
+validate_files() {
+    local i src dest
+    for ((i = 0; i < ${#FILES[@]}; i += 2)); do
+        src=${FILES[i]}
+        dest=${FILES[i+1]}
+        [[ -f $src && -r $src ]] || {
+            echo "File not found or unreadable: ${src}" >&2
+            exit 1
+        }
+        [[ $dest == /* ]] || {
+            echo "Destination must be an absolute path: ${dest}" >&2
+            exit 1
+        }
+        [[ $dest != *..* ]] || {
+            echo "Destination must not contain '..': ${dest}" >&2
+            exit 1
+        }
+    done
+}
 
+install_files() {
+    local i src dest
+    for ((i = 0; i < ${#FILES[@]}; i += 2)); do
+        src=${FILES[i]}
+        dest=${FILES[i+1]}
+        echo "Installing ${src} -> ${dest}"
+        sudo install -D -m 0644 -o root -g root "$src" "root${dest}" || exit 1
+    done
+}
 
 ###############################################################################
 # Install Process
 ##############################################################################
 if [[ -n $PUBKEY ]]; then
     validate_pubkey
+fi
+
+if ((${#FILES[@]} > 0)); then
+    validate_files
 fi
 
 if [[ -n $SETUP_SCRIPT ]]; then
@@ -503,6 +547,10 @@ fi
 
 if $REMOVE_ALARM; then
     remove_alarm_user
+fi
+
+if ((${#FILES[@]} > 0)); then
+    install_files
 fi
 
 cleanup $BOOT_PARTITION $ROOT_PARTITION
